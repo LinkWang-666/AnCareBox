@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<!-- 适老化：允许缩放，老人可以自己放大 -->
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FAF6EC">
+<meta name="format-detection" content="telephone=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>安心格 · 老人端</title>
+<link rel="stylesheet" href="css/elder.css?v=20261102b">
+</head>
+<body class="elder">
+
+<!-- ================= 未绑定：只输 6 位数字 ================= -->
+<div class="bind-wrap" id="bindWrap" style="display:none">
+  <div class="bind-hero">
+    <div class="bind-ico">📦</div>
+    <div class="bind-tips" style="border:none;background:none;padding:0 0 6px">
+      请把子女手机上的 6 位绑定码，输入到下面
+    </div>
+  </div>
+  <input id="bindCode" class="ebind-input" maxlength="6" inputmode="numeric" placeholder="······" autocomplete="off">
+  <button class="sos-card take" id="btnBind" style="animation:none">
+    <span class="big">✓ 绑定这台药箱</span>
+  </button>
+  <div class="bind-tips" style="margin-top:22px">
+    绑定码由子女在手机上点「生成绑定码」获得，5 分钟内有效。<br>
+    只需绑定一次，以后打开就能直接用了。
+  </div>
+</div>
+
+<!-- ================= 顶部问候 + 大时钟 ================= -->
+<div class="ehead" id="mainHead" style="display:none">
+  <div>
+    <div class="greet" id="greetLine">您好</div>
+    <div class="sub" id="subLine">正在加载…</div>
+  </div>
+  <div class="clockbox">
+    <div class="clock" id="clock">--:--</div>
+    <div class="date" id="dateLine"></div>
+  </div>
+</div>
+
+<!-- ================= 共用模式：现在是谁在用药 ================= -->
+<div class="who-bar" id="whoBar"></div>
+
+<div class="ewrap" id="mainWrap" style="display:none">
+
+  <!-- 当前该吃的药 -->
+  <section id="nowBox"></section>
+
+  <!-- 这一顿已经吃完 -->
+  <div class="edone" id="doneHint" style="display:none">
+    ✓ 这顿已经吃好了
+    <small>下次吃药的时间到了，会再提醒您。</small>
+  </div>
+
+  <!-- 我不舒服：常驻底部，任何滚动位置都能一把按到（方案书 6.4） -->
+  <button class="sos-card dock" id="btnSos">
+    <span class="ph">☎</span>
+    <span class="big">我不舒服</span>
+    <span class="hint">按一下，马上通知子女</span>
+  </button>
+
+  <!-- 今日打卡 -->
+  <section class="daycard">
+    <div class="t">今天吃了几次</div>
+    <div class="daydots" id="dayDots"></div>
+  </section>
+
+  <!-- 家人录音 -->
+  <section class="voice" id="voiceBox" style="display:none">
+    <div class="t">家人录音 · 点一下听</div>
+    <div id="voiceList"></div>
+  </section>
+
+  <!-- 操作说明 -->
+  <section class="guide">
+    <b>怎么用</b>
+    <p>1. 药箱亮起哪一格、听到提醒，就打开哪一格。</p>
+    <p>2. 把格子里的药全部取出，温水送服。</p>
+    <p>3. 吃完按绿色大按钮「我吃好了」，就不会再提醒。</p>
+    <p>4. 身体不舒服，随时按红色「我不舒服」。</p>
+  </section>
+
+  <a class="backlink" href="/m/index.html">返回子女端</a>
+</div>
+
+<audio id="player" style="display:none"></audio>
+<div class="e-toast" id="toast"></div>
+
+<script src="/js/config.js?v=20261106b"></script>
+<script src="/js/api.js?v=20261106b"></script>
+<script src="js/elder.js?v=20261112a"></script>
+</body>
+</html>

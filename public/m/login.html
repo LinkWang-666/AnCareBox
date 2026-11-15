@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FAF6EC">
+<title>登录 · 安心格</title>
+<style>
+  :root{
+    --bg:#FAF6EC; --card:#FFFDFA;
+    --primary:#4F7D66; --primary-deep:#3E6851; --tint:#E9F0E9;
+    --accent:#D98D5F; --accent-soft:#F6E7DB;
+    --ink:#2C342F; --sub:#6F7B73; --muted:#938F85; --faint:#AAA49A;
+    --line:#ECE4D4; --line-soft:#F3EEE4; --bad:#B5644E;
+    --r:20px;
+    --sans:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+    --safe-b:env(safe-area-inset-bottom,0px);
+    --safe-t:env(safe-area-inset-top,0px);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{background:var(--bg);color:var(--ink);font-family:var(--sans);
+    font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+
+  .wrap{max-width:520px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column}
+
+  /* 顶部品牌区 */
+  .hero{
+    background:linear-gradient(155deg,#4F7D66 0%,#3E6851 55%,#2F5446 100%);
+    color:#EFF5F0;padding:calc(var(--safe-t) + 42px) 26px 34px;
+    border-radius:0 0 28px 28px;position:relative;overflow:hidden;
+    box-shadow:0 20px 44px -32px rgba(47,84,70,.9);
+  }
+  .hero::after{content:"";position:absolute;right:-60px;top:-70px;width:200px;height:200px;
+    border-radius:50%;background:rgba(255,255,255,.07)}
+  .hero .logo{display:flex;align-items:center;gap:10px;font-size:16px;font-weight:600;color:#fff}
+  .hero .logo .mk{width:38px;height:38px;border-radius:11px;background:rgba(255,255,255,.14);
+    display:grid;place-items:center;border:1px solid rgba(255,255,255,.18)}
+  .hero .logo svg{width:26px;height:26px}
+  .hero h1{font-size:25px;font-weight:600;line-height:1.45;margin:22px 0 8px;position:relative;z-index:1}
+  .hero p{font-size:12.5px;color:#C6DCD4;line-height:1.7;position:relative;z-index:1}
+
+  /* 表单卡 */
+  .form{padding:22px 20px calc(28px + var(--safe-b));flex:1}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:20px 18px;
+    box-shadow:0 18px 42px -34px rgba(75,60,45,.9)}
+  .field{margin-bottom:14px}
+  .field label{display:block;font-size:12px;color:var(--sub);margin-bottom:6px}
+  .field input{width:100%;height:48px;border:1px solid var(--line);border-radius:12px;
+    background:#fff;padding:0 14px;font-size:15px;color:var(--ink);outline:none;transition:border .15s,box-shadow .15s}
+  .field input:focus{border-color:var(--primary);box-shadow:0 0 0 4px rgba(79,125,102,.12)}
+  .err{display:none;font-size:12.5px;color:var(--bad);margin:-4px 0 12px;line-height:1.5}
+  .err.on{display:block}
+  .btn{width:100%;height:50px;border-radius:12px;
+    background-color:var(--primary);
+    background-image:linear-gradient(180deg,rgba(255,255,255,.18),rgba(0,0,0,.05));
+    color:#fff;font-size:15.5px;font-weight:500;
+    box-shadow:0 12px 26px -16px var(--primary);
+    transition:transform .18s cubic-bezier(.2,.7,.3,1),box-shadow .18s cubic-bezier(.2,.7,.3,1),background-color .15s}
+  .btn:active{background-color:var(--primary-deep);transform:scale(.99);box-shadow:0 6px 14px -12px var(--primary)}
+  .btn:disabled{background-image:none;background-color:#C9D6D2;box-shadow:none}
+
+  .demo{margin-top:18px}
+  .demo .lb{font-size:11.5px;color:var(--muted);margin-bottom:8px}
+  .demo .items{display:flex;gap:8px;flex-wrap:wrap}
+  .demo .items button{
+    font-size:12px;padding:7px 12px;border-radius:20px;border:1px solid var(--line);
+    background:#fff;color:var(--sub);transition:background .15s,border-color .15s;
+  }
+  .demo .items button:active{background:var(--tint);border-color:rgba(79,125,102,.3)}
+
+  .foot{margin-top:22px;text-align:center;font-size:12.5px;color:var(--sub);line-height:1.8}
+  .foot a{color:var(--primary);font-weight:500}
+  .fine{margin-top:18px;text-align:center;font-size:11px;color:var(--faint);line-height:1.7}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="hero">
+    <div class="logo">
+      <span class="mk">
+        <svg viewBox="0 0 24 24" fill="none" stroke-linejoin="round">
+          <path d="M2.9 11.1 12 6l9.1 5.1-9.1 5.1Z" fill="#DCEBE5" stroke="#CFE3DC" stroke-width="1.25"/>
+          <path d="M2.9 11.1 12 16.2v4.5L2.9 15.6Z" fill="#EAF3EF" stroke="#CFE3DC" stroke-width="1.25"/>
+          <path d="M21.1 11.1 12 16.2v4.5l9.1-5.1Z" fill="#EAF3EF" stroke="#CFE3DC" stroke-width="1.25"/>
+        </svg>
+      </span>
+      安心格
+    </div>
+    <h1>让每一次提醒<br>都有家人回应</h1>
+    <p>服药计划 · 药箱库存 · 语音提醒 · 漏服告警<br>只做提醒、记录与科普，不诊断、不开处方</p>
+  </div>
+
+  <div class="form">
+    <div class="card">
+      <form id="loginForm">
+        <div class="field">
+          <label>账号</label>
+          <input id="username" type="text" autocomplete="username" placeholder="请输入账号" inputmode="text">
+        </div>
+        <div class="field">
+          <label>密码</label>
+          <input id="password" type="password" autocomplete="current-password" placeholder="请输入密码">
+        </div>
+        <p class="err" id="loginErr"></p>
+        <button class="btn" type="submit" id="btnLogin">登 录</button>
+      </form>
+
+      <div class="demo">
+        <div class="lb">演示账号（点一下自动填充）</div>
+        <div class="items" id="demoItems">
+          <button data-u="wangxm">王小梅 · 主配置人</button>
+          <button data-u="wanggg">王国栋 · 可配置</button>
+          <button data-u="li_owner">李强 · 另一家庭</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="foot">
+      老人使用？<a href="/m/elder.html">进入老人端（6 位绑定码）</a><br>
+      <a href="/m/landing.html">第一次用？先看看安心格是什么</a>
+    </div>
+
+    <p class="fine">
+      安心格 · 家庭用药协同系统<br>
+      登录即表示同意仅将本系统用于家庭用药提醒与记录
+    </p>
+  </div>
+</div>
+
+<script src="/js/config.js?v=20261106b"></script>
+<script src="/js/api.js?v=20261106b"></script>
+<script>
+(function () {
+  'use strict';
+  var DEMO_PWD = 'medbox2026';
+
+  function el(id) { return document.getElementById(id); }
+  function err(id, msg) {
+    var e = el(id);
+    if (!e) return;
+    e.textContent = msg || '';
+    e.className = 'err' + (msg ? ' on' : '');
+  }
+
+  /** 登录成功后的跳转：优先回 from，否则进移动端首页 */
+  function afterLogin(d) {
+    if (d && d.accessToken) api.setToken(d.accessToken);
+    var q = new URLSearchParams(location.search);
+    var from = q.get('from');
+    // 只允许跳到站内路径，避免开放重定向
+    if (from && from.charAt(0) === '/' && from.indexOf('//') !== 0) {
+      location.replace(from);
+    } else {
+      location.replace('/m/index.html');
+    }
+  }
+
+  el('loginForm').addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    var u = el('username').value.trim();
+    var p = el('password').value;
+    if (!u || !p) return err('loginErr', '请输入账号和密码');
+
+    var btn = el('btnLogin');
+    btn.disabled = true;
+    btn.textContent = '登录中...';
+
+    // 登录接口不走 api.post，避免 401 时误触发续期逻辑
+    fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ username: u, password: p }),
+    })
+      .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
+      .then(function (res) {
+        if (!res.ok) {
+          err('loginErr', res.d.error || '登录失败');
+          btn.disabled = false;
+          btn.textContent = '登 录';
+          return;
+        }
+        afterLogin(res.d);
+      })
+      .catch(function (e) {
+        err('loginErr', '网络异常：' + e.message);
+        btn.disabled = false;
+        btn.textContent = '登 录';
+      });
+  });
+
+  el('password').addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') el('loginForm').requestSubmit();
+  });
+
+  Array.prototype.forEach.call(document.querySelectorAll('#demoItems button'), function (b) {
+    b.addEventListener('click', function () {
+      el('username').value = this.getAttribute('data-u');
+      el('password').value = DEMO_PWD;
+      err('loginErr');
+    });
+  });
+
+  // 已有令牌直接进首页（刷新页面不会卡在登录页）
+  if (api.getToken()) {
+    api.get('/auth/me').then(function () {
+      location.replace('/m/index.html');
+    }).catch(function () { /* 令牌失效就留在登录页 */ });
+  }
+})();
+</script>
+</body>
+</html>

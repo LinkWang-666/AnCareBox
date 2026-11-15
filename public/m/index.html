@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#FAF6EC">
+<meta name="format-detection" content="telephone=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>安心格 · 家庭用药协同</title>
+<link rel="stylesheet" href="css/app.css?v=20261103c">
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ================= 顶栏 ================= -->
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke-linejoin="round">
+          <path d="M2.9 11.1 12 6l9.1 5.1-9.1 5.1Z" fill="#E4EFE8" stroke="#3E6851" stroke-width="1.25"/>
+          <path d="M2.9 11.1 12 16.2v4.5L2.9 15.6Z" fill="#4F7D66" stroke="#3E6851" stroke-width="1.25"/>
+          <path d="M21.1 11.1 12 16.2v4.5l9.1-5.1Z" fill="#4F7D66" stroke="#3E6851" stroke-width="1.25"/>
+          <rect x="8.6" y="9.9" width="4.6" height="2.2" rx="1.1" transform="rotate(-28 8.6 9.9)" fill="#fff" stroke="#8FB4A6" stroke-width=".7"/>
+        </svg>
+      </div>
+      <div class="txt">
+        <b>安心格</b>
+        <small id="topSub">正在连接…</small>
+      </div>
+    </div>
+
+    <div class="topact">
+      <button class="iconbtn" id="btnBell" aria-label="告警">
+        <svg viewBox="0 0 24 24"><path d="M18 9a6 6 0 1 0-12 0c0 5-2 6-2 6h16s-2-1-2-6"/><path d="M10.3 19a2 2 0 0 0 3.4 0"/></svg>
+        <i class="dot" id="bellDot" style="display:none"></i>
+      </button>
+      <button class="iconbtn" id="btnToElder" aria-label="老人端">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.4"/><path d="M5 20c0-3.9 3.1-6.2 7-6.2s7 2.3 7 6.2"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- ================= 总览 ================= -->
+  <section class="view on" id="v-overview">
+    <div id="ovHero"></div>
+    <div class="stats" id="ovStats"></div>
+
+    <div class="sec-h"><h3>今天要吃的药</h3><span class="more" data-go="care" data-seg="plan">服药计划</span></div>
+    <div class="card" id="ovTimeline"></div>
+
+    <div class="sec-h"><h3>需要关注</h3><span class="more" data-go="box">药箱库存</span></div>
+    <div class="card flat rows" id="ovFocus"></div>
+
+    <div class="sec-h"><h3>未处理告警</h3><span class="more" data-page="alert">全部</span></div>
+    <div class="alist" id="ovAlerts"></div>
+
+    <div class="sec-h"><h3>AI 主动建议</h3><span class="more" data-page="assistant">去问问</span></div>
+    <div class="ai-card" id="ovAi"></div>
+  </section>
+
+  <!-- ================= 用药（服药计划 + 服药记录） ================= -->
+  <section class="view" id="v-care">
+    <div class="pagehead">
+      <div class="kicker">按时 · 按量 · 可追溯</div>
+      <h2>用药</h2>
+      <p id="careSub">加载中…</p>
+    </div>
+
+    <div class="seg" id="careSeg">
+      <button class="seg-b on" data-seg="plan">服药计划</button>
+      <button class="seg-b" data-seg="his">服药记录</button>
+    </div>
+
+    <!-- 分段：服药计划 -->
+    <div id="segPlan">
+      <div class="card">
+        <div style="display:flex;align-items:baseline;justify-content:space-between">
+          <b style="font-size:14px">近 7 日服药情况</b>
+          <span style="font-size:11.5px;color:var(--muted)" id="weekAvg"></span>
+        </div>
+        <div class="week" id="planWeek"></div>
+      </div>
+
+      <div class="sec-h"><h3>今日安排</h3><span class="muted-sm" id="planCount"></span></div>
+      <div id="planList"></div>
+
+      <div style="margin-top:16px">
+        <button class="btn-primary" id="btnAddPlan">+ 新增服药计划</button>
+      </div>
+    </div>
+
+    <!-- 分段：服药记录 -->
+    <div id="segHis" style="display:none">
+      <p style="font-size:12px;color:var(--muted);margin:0 0 8px" id="hisSub">最近记录</p>
+      <div class="chips" id="hisChips"></div>
+      <div class="card flat rows" id="hisList" style="margin-top:10px"></div>
+    </div>
+  </section>
+
+  <!-- ================= 药箱 ================= -->
+  <section class="view" id="v-box">
+    <div class="pagehead">
+      <div class="kicker">库存 · 效期 · 安全</div>
+      <h2>药箱库存</h2>
+      <p id="boxSub">加载中…</p>
+    </div>
+
+    <div class="stats" id="boxStats"></div>
+
+    <!-- 隔间分装 + 装药清单（方案书 6.1.3：哪个格子放哪几种药、共几片） -->
+    <div class="card">
+      <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px">
+        <b style="font-size:14px">隔间分装</b>
+        <span class="muted-sm" id="slotSub"></span>
+      </div>
+      <div class="slots" id="boxSlots"></div>
+    </div>
+
+    <div class="sec-h"><h3>装药清单</h3><span class="muted-sm">照单装药 · 别装错格</span></div>
+    <div class="card flat rows" id="loadList"></div>
+
+    <div class="sec-h"><h3>在库药品</h3><span class="muted-sm" id="boxSort">按剩余量</span></div>
+    <div class="chips" id="boxChips"></div>
+    <div class="card flat rows" id="boxList" style="margin-top:10px"></div>
+
+    <div style="margin-top:16px">
+      <button class="btn-primary" id="btnAddMed">+ 添加药品</button>
+    </div>
+  </section>
+
+  <!-- ================= 我的 ================= -->
+  <section class="view" id="v-me">
+    <div style="padding-top:16px"><div id="meProfile"></div></div>
+
+    <div class="sec-h"><h3>老人档案</h3><span class="more" id="meSwitch">切换</span></div>
+    <div class="card flat rows" id="meElders"></div>
+
+    <div class="sec-h"><h3>家庭成员</h3><span class="more" data-page="family">管理</span></div>
+    <div class="card flat rows" id="meMembers"></div>
+
+    <div class="sec-h"><h3>功能</h3></div>
+    <div class="card flat rows" id="meMenu"></div>
+
+    <p style="text-align:center;font-size:11px;color:var(--faint);margin:20px 0 6px;line-height:1.8">
+      安心格 · 家庭用药协同系统（移动端）<br>
+      只做提醒、记录与科普，不诊断、不开处方、不替代药师
+    </p>
+  </section>
+
+  <!-- ================= 底部导航（中间是 AI 用药助手） ================= -->
+  <nav class="tabbar">
+    <button class="tab on" data-tab="overview">
+      <svg viewBox="0 0 24 24"><path d="M4 10.6 12 4l8 6.6V19a1.6 1.6 0 0 1-1.6 1.6h-3.2v-5.4H8.8v5.4H5.6A1.6 1.6 0 0 1 4 19z"/></svg>
+      <span>总览</span>
+    </button>
+    <button class="tab" data-tab="care">
+      <svg viewBox="0 0 24 24"><rect x="3.6" y="5" width="16.8" height="15.4" rx="2.6"/><path d="M8 3.2v3.4M16 3.2v3.4M3.6 9.6h16.8"/><path d="M9 14.4l2 2 3.6-3.6"/></svg>
+      <span>用药</span>
+    </button>
+    <button class="tab-ai" id="btnAiTab" aria-label="AI 用药助手">
+      <span class="ai-ring">
+        <svg viewBox="0 0 24 24"><rect x="4.4" y="7.6" width="15.2" height="11.6" rx="3.4"/><path d="M12 3.4v4.2"/><circle cx="12" cy="3" r="1.2"/><circle cx="9.2" cy="12.6" r="1.05"/><circle cx="14.8" cy="12.6" r="1.05"/><path d="M9.6 16.1h4.8"/></svg>
+      </span>
+      <span class="lb">AI 助手</span>
+    </button>
+    <button class="tab" data-tab="box">
+      <svg viewBox="0 0 24 24"><path d="M3.6 8.4h16.8v9.8a2 2 0 0 1-2 2H5.6a2 2 0 0 1-2-2z"/><path d="M7.2 8.4V6.6a2 2 0 0 1 2-2h5.6a2 2 0 0 1 2 2v1.8M10 13.2h4"/></svg>
+      <span>药箱</span>
+    </button>
+    <button class="tab" data-tab="me">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="8.2" r="3.6"/><path d="M4.8 20c0-3.9 3.2-6.3 7.2-6.3s7.2 2.4 7.2 6.3"/></svg>
+      <span>我的</span>
+    </button>
+  </nav>
+</div>
+
+<!-- ================= 子页：告警中心 ================= -->
+<div class="subpage" id="sp-alert">
+  <div class="sp-head">
+    <button class="back" data-back><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+    <b>告警中心</b>
+    <button class="act act-btn" id="ackAll">全部处理</button>
+  </div>
+  <div class="sp-body">
+    <div class="chips" id="alChips" style="margin-bottom:10px"></div>
+    <div class="alist" id="alList"></div>
+    <div class="tip-note">
+      规则命中只是候选，不是结论。每条候选告警都会经过模型二次研判：结合老人的慢病、过敏史、年龄与近期取药记录，判断这个组合在他身上到底有多危险，再决定推不推、推给谁。
+    </div>
+  </div>
+</div>
+
+<!-- ================= 子页：AI 助手 ================= -->
+<div class="subpage sp-tabbed" id="sp-assistant">
+  <div class="sp-head">
+    <button class="back" data-back><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+    <b>AI 用药助手</b>
+    <button class="act act-btn" id="aiRefresh">刷新</button>
+  </div>
+  <div class="sp-body ai-page-body">
+    <div class="ai-card ai-hero">
+      <div class="ai-top">
+        <div class="ai-avatar">✦</div>
+        <div><b>你好，我是用药助手</b><small>主动式 Agent · 已分析家庭用药数据</small></div>
+      </div>
+      <div class="ai-body" id="aiHero">正在分析…</div>
+    </div>
+
+    <div class="sec-h"><h3>主动建议</h3><span class="muted-sm" id="aiCount"></span></div>
+    <div class="card ai-card ai-insights" id="aiInsights" style="background:#fff;border-color:var(--line)">
+      <div class="empty"><div class="t">正在生成建议…</div></div>
+    </div>
+
+    <div class="sec-h"><h3>用药问答</h3></div>
+    <div class="card chat-card">
+      <div class="chat-log" id="chatLog">
+        <div class="msg ai">我是家里的用药助手。可以问我「今天还有几次药没吃」「王秀英的药有没有冲突」「哪些药快过期了」，也能直接让我帮你改计划、加药。</div>
+      </div>
+      <div class="chat-foot">
+        <div class="chat-input">
+          <textarea id="chatInput" rows="1" placeholder="说一句话，我直接帮你办"></textarea>
+          <button id="btnAsk">发送</button>
+        </div>
+        <div class="confirm-bar" id="aiConfirm">
+          <span class="tx" id="aiConfirmText">需要确认</span>
+          <button class="no" id="aiConfirmNo">取消</button>
+          <button class="yes" id="aiConfirmYes">确认执行</button>
+        </div>
+        <p class="chat-disclaimer">不诊断、不开处方，仅供参考，具体用药请咨询医生或药师。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= 子页：语音提醒 ================= -->
+<div class="subpage" id="sp-voice">
+  <div class="sp-head">
+    <button class="back" data-back><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+    <b>语音提醒</b>
+  </div>
+  <div class="sp-body">
+    <p style="font-size:12.5px;color:var(--sub);line-height:1.75;margin-bottom:12px">
+      用家人的声音提醒吃药 · 录好后同步到老人端<br>
+      建议这样说：「妈，12 点半了，把 2 号格的药吃了」
+    </p>
+
+    <div class="card">
+      <div class="rec" id="recBox">
+        <div class="wave"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="tm" id="recTime">00:00</div>
+        <button class="mic" id="btnRec">
+          <svg viewBox="0 0 24 24"><rect x="9" y="2.6" width="6" height="11" rx="3"/><path d="M5.6 11.2a6.4 6.4 0 0 0 12.8 0"/><path d="M12 17.6v3.6M8.6 21.2h6.8"/></svg>
+        </button>
+        <p class="hint" id="recHint">点一下开始录音，再点一下停止</p>
+      </div>
+      <div class="f2" style="margin-top:10px">
+        <div class="field"><label>绑定时段</label><select id="vPlan"></select></div>
+        <div class="field"><label>方言</label><input id="vDialect" placeholder="常州话"></div>
+      </div>
+      <button class="btn-primary" id="btnSaveVoice">保存这段提醒</button>
+    </div>
+
+    <div class="sec-h"><h3>已保存的声音</h3><span class="muted-sm" id="vCount"></span></div>
+    <div class="card flat rows" id="vList"></div>
+
+    <div class="tip-note">
+      老人听不懂普通话也没关系：到点会优先播放子女录音，老人在老人端点「放录音提醒我」也能重听。
+    </div>
+  </div>
+</div>
+
+<!-- ================= 子页：家庭成员 ================= -->
+<div class="subpage" id="sp-family">
+  <div class="sp-head">
+    <button class="back" data-back><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+    <b>家庭成员</b>
+    <span class="act" id="btnInvite">+ 邀请</span>
+  </div>
+  <div class="sp-body">
+    <div class="card">
+      <div style="display:flex;align-items:baseline;justify-content:space-between">
+        <b style="font-size:14px">老人档案</b>
+        <span style="font-size:11px;color:var(--muted)">听力视力决定默认音量与字号</span>
+      </div>
+      <div id="famElder" style="margin-top:4px"></div>
+      <div class="divider"></div>
+      <b style="font-size:14px">药箱设备</b>
+      <div id="famDevice" style="margin-top:4px"></div>
+    </div>
+
+    <div class="sec-h"><h3>照护成员</h3><span class="muted-sm" id="famCount"></span></div>
+    <div class="card flat rows" id="famList"></div>
+
+    <div class="tip-note">主配置人可改一切；可配置能改计划与告警；只读仅查看记录。每位成员可以单独选择接收哪些告警，避免全家被无效提醒打扰。</div>
+  </div>
+</div>
+
+<!-- ================= 子页：提醒策略 ================= -->
+<div class="subpage" id="sp-policy">
+  <div class="sp-head">
+    <button class="back" data-back><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+    <b>提醒策略</b>
+  </div>
+  <div class="sp-body" id="policyBody"></div>
+</div>
+
+<!-- ================= 子页：用药单与数据 ================= -->
+<div class="subpage" id="sp-data">
+  <div class="sp-head">
+    <button class="back" data-back><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+    <b>用药单与数据</b>
+  </div>
+  <div class="sp-body">
+    <div class="card">
+      <b style="font-size:14px">就诊用的用药记录单</b>
+      <p style="font-size:12px;color:var(--sub);line-height:1.75;margin:6px 0 12px">
+        带在服药品清单（名称、规格、分类）和最近 500 条服药流水。复诊时直接给医生看，比自己回忆吃了什么准得多。
+      </p>
+      <button class="btn-primary" id="btnExportRecord">生成用药单</button>
+      <div id="recPreview" style="margin-top:12px"></div>
+    </div>
+
+    <div class="card">
+      <b style="font-size:14px">我的数据</b>
+      <p style="font-size:12px;color:var(--sub);line-height:1.75;margin:6px 0 12px">
+        健康数据属敏感个人信息：只收集用药需要的最小范围，随时可以整份导出，也可以一键删除。
+      </p>
+      <button class="btn-ghost" id="btnExportData">导出全部数据（JSON）</button>
+      <button class="btn-ghost" id="btnWipeData" style="margin-top:8px;color:var(--bad)">删除全部家庭数据</button>
+      <p style="font-size:11px;color:var(--faint);margin-top:8px">仅主配置人可删除，删除后不可恢复。</p>
+    </div>
+
+    <div class="tip-note">
+      本系统只做提醒、记录与科普，不诊断、不开处方、不替代药师。所有药品信息仅供家属核对，用药调整请遵医嘱。
+    </div>
+  </div>
+</div>
+
+<!-- ================= 弹层 ================= -->
+<div class="mask" id="mask"></div>
+<div class="sheet" id="sheet">
+  <div class="grab"></div>
+  <h3 id="shTitle">标题</h3>
+  <p class="sh-sub" id="shSub"></p>
+  <div class="sh-body" id="shBody"></div>
+</div>
+
+<!-- ================= 悬浮 AI 助手（随手问） ================= -->
+<button class="ai-fab" id="aiFab" aria-label="AI 用药助手">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="4.2" y="7.4" width="15.6" height="11.4" rx="4"/>
+    <path d="M12 4.2v3.2"/><circle cx="12" cy="3.4" r="1.2" fill="currentColor" stroke="none"/>
+    <circle cx="9" cy="12.6" r="1.05" fill="currentColor" stroke="none"/>
+    <circle cx="15" cy="12.6" r="1.05" fill="currentColor" stroke="none"/>
+    <path d="M9.7 15.9c.65.65 1.42.98 2.3.98s1.65-.33 2.3-.98"/>
+  </svg>
+  <i class="fb-dot" id="fabDot" style="display:none"></i>
+</button>
+
+<div class="ai-pop" id="aiPop">
+  <div class="ap-head">
+    <span class="sp">✦</span>
+    <b>用药助手</b>
+    <small>问一句，我直接办</small>
+    <button class="ap-x" id="apClose" aria-label="关闭">×</button>
+  </div>
+  <div class="ap-log" id="apLog">
+    <div class="msg ai">今天还有几次药没吃、哪些药快过期、王秀英的药有没有冲突，都可以问我；也能直接让我加药、改计划。</div>
+  </div>
+  <div class="ap-in">
+    <input id="apInput" placeholder="说一句话…" autocomplete="off">
+    <button id="apSend">发送</button>
+  </div>
+  <div class="ap-cfm" id="apCfm">
+    <span id="apCfmText">需要确认</span>
+    <button id="apNo">取消</button>
+    <button id="apYes">确认</button>
+  </div>
+  <button class="ap-more" id="apMore">打开完整助手 · 看主动建议 ›</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="/js/config.js?v=20261106b"></script>
+<script src="/js/api.js?v=20261106b"></script>
+<script src="js/data.js?v=20261101g"></script>
+<script src="js/app.js?v=20261106f"></script>
+</body>
+</html>

@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FAF6EC">
+<title>安心格 · 把每一粒药，交到对的时间</title>
+<style>
+  :root{
+    --bg:#FAF6EC; --card:#FFFDFA;
+    --primary:#4F7D66; --primary-deep:#3E6851; --tint:#E9F0E9;
+    --accent:#D98D5F; --accent-soft:#F6E7DB;
+    --ink:#2C342F; --sub:#6F7B73; --muted:#938F85; --faint:#AAA49A;
+    --line:#ECE4D4; --line-soft:#F3EEE4;
+    --ok:#4F8A66; --warn:#B0823F; --bad:#B5644E;
+    --r:20px;
+    --sans:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+    --num:"Inter","Helvetica Neue",Arial,sans-serif;
+    --safe-b:env(safe-area-inset-bottom,0px);
+    --safe-t:env(safe-area-inset-top,0px);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{background:var(--bg);color:var(--ink);font-family:var(--sans);
+    font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+  img,svg{display:block}
+  .wrap{max-width:520px;margin:0 auto}
+
+  /* ---------- 通用 ---------- */
+  .kicker{font-size:10px;letter-spacing:2.4px;color:var(--faint)}
+  .sec{padding:50px 20px}
+  .sec.white{background:#fff;border-top:1px solid var(--line-soft);border-bottom:1px solid var(--line-soft)}
+  .sec.tint{background:#F3EFE6}
+  .sec.dark{background:#2C5A53;color:#EAF2EF}
+  .head{text-align:center;margin-bottom:26px}
+  .head h2{font-size:22px;line-height:1.46;font-weight:600;letter-spacing:-.4px;color:#1C2925;margin-top:11px}
+  .head .sub2{margin-top:11px;font-size:12.5px;line-height:1.9;color:var(--sub)}
+  .sec.dark .kicker{color:#8FB3AA}
+  .sec.dark h2,.sec.dark h3{color:#F2F8F5}
+  .sec.dark p{color:#BFD4CD}
+
+  /* ---------- 顶栏 ---------- */
+  .bar{position:sticky;top:0;z-index:40;height:calc(52px + var(--safe-t));
+    padding:var(--safe-t) 18px 0;display:flex;align-items:center;justify-content:space-between;
+    background:rgba(250,246,236,.93);backdrop-filter:blur(10px);
+    border-bottom:1px solid rgba(236,228,212,.9)}
+  .brand{display:flex;align-items:center;gap:9px;font-size:15px;font-weight:600;letter-spacing:.3px}
+  .brand .mk{width:30px;height:30px;border-radius:9px;background:#E7EFEB;display:grid;place-items:center;flex:none}
+  .brand .mk svg{width:23px;height:23px}
+  .bar .act{height:32px;padding:0 13px;border-radius:9px;font-size:12.5px;color:var(--sub);
+    border:1px solid var(--line);background:#fff;transition:background .15s}
+  .bar .act:active{background:#F5F1E7}
+
+  /* ---------- Hero ---------- */
+  .hero{text-align:center;padding:34px 20px 0}
+  .hero .kicker{letter-spacing:2.8px}
+  .hero h1{font-size:30px;line-height:1.38;font-weight:600;letter-spacing:-.6px;color:#1C2925;margin-top:13px}
+  .hero h1 i{font-style:normal;color:var(--primary)}
+  .hero .lead{margin-top:16px;font-size:13.5px;line-height:1.95;color:var(--sub)}
+  .ctas{display:grid;grid-template-columns:1.55fr 1fr;gap:10px;margin-top:24px}
+  .btn{height:50px;border-radius:13px;font-size:15px;font-weight:500;
+    display:flex;align-items:center;justify-content:center;gap:7px;
+    transition:transform .16s cubic-bezier(.2,.7,.3,1),background-color .15s,box-shadow .16s}
+  .btn .ic{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8;
+    stroke-linecap:round;stroke-linejoin:round;flex:none}
+  .btn.pri{background-color:var(--primary);
+    background-image:linear-gradient(180deg,rgba(255,255,255,.16),rgba(0,0,0,.05));
+    color:#fff;box-shadow:0 14px 28px -16px rgba(79,125,102,.95)}
+  .btn.pri:active{background-color:var(--primary-deep);transform:scale(.985);
+    box-shadow:0 6px 14px -12px rgba(79,125,102,.9)}
+  .btn.gho{background:#fff;border:1px solid var(--line);color:var(--ink);font-size:14px}
+  .btn.gho:active{background:#F7F4EC;transform:scale(.985)}
+  .hint{margin-top:14px;font-size:11px;color:var(--faint);line-height:1.8}
+
+  /* Hero 药箱 */
+  .stage{position:relative;margin:24px 0 0;background:#EDE7D9;border:1px solid #E3DBC9;
+    border-radius:20px;padding:16px 14px;display:flex;justify-content:center}
+  .dev{position:relative;z-index:2;width:100%;background:#FCFAF3;border:1px solid #E2D9C7;
+    border-radius:16px;padding:13px 13px 11px;box-shadow:0 20px 38px -26px rgba(33,43,40,.5)}
+  .dev-top{display:flex;align-items:center;justify-content:space-between;
+    font-size:10.5px;color:var(--muted);padding-bottom:10px;border-bottom:1px solid #EDE5D5}
+  .dev-name{display:flex;align-items:center;gap:6px}
+  .dev-name::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--ok)}
+  .dev-clock{font-family:var(--num);font-size:12.5px;color:var(--ink);font-weight:600;letter-spacing:.4px}
+  .dev-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin:12px 0 11px}
+  .dev-grid i{display:grid;place-items:center;height:40px;border:1px solid #E6DDCB;border-radius:9px;
+    background:#F7F4EA;font-family:var(--num);font-size:12px;font-style:normal;color:#B4B8AE}
+  .dev-grid i.hot{background:#EAF1ED;border-color:#CBDCD6;color:var(--primary);font-weight:600}
+  .dev-foot{display:flex;align-items:center;justify-content:space-between;font-size:10px;color:var(--faint)}
+
+  /* Hero 浮标 → 手机改为两枚并排小卡 */
+  .tags{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:11px}
+  .tagc{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 11px;text-align:left;
+    box-shadow:0 14px 28px -24px rgba(33,43,40,.5)}
+  .tagc span{display:block;font-size:9.5px;color:var(--muted);letter-spacing:.3px}
+  .tagc b{display:block;font-family:var(--num);font-size:16px;font-weight:600;color:var(--ink);margin:3px 0 2px}
+  .tagc b.txt{font-family:var(--sans);font-size:13px}
+  .tagc small{font-size:10px;color:var(--faint)}
+
+  /* ---------- 数据条 ---------- */
+  .strip{display:grid;grid-template-columns:1fr 1fr;margin:26px 0 0;border-top:1px solid var(--line)}
+  .strip div{padding:16px 0;border-bottom:1px solid var(--line-soft);text-align:center}
+  .strip div:nth-child(odd){border-right:1px solid var(--line-soft)}
+  .strip b{display:block;font-family:var(--num);font-size:20px;font-weight:600;color:#1C2925;letter-spacing:-.3px}
+  .strip span{display:block;font-size:10.5px;color:var(--muted);margin-top:4px;line-height:1.5}
+
+  /* ---------- 八格分装 ---------- */
+  .c8{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+  .cell{position:relative;height:116px;border-radius:12px;background:#FBF8F0;
+    border:1px solid #E6DFCF;overflow:visible;cursor:pointer;
+    transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease}
+  .cell.open{border-color:#C7D9D2;box-shadow:0 16px 30px -24px rgba(33,43,40,.5)}
+  .cb{position:absolute;inset:0;padding:10px 11px;display:flex;flex-direction:column}
+  .row1{display:flex;align-items:center;justify-content:space-between}
+  .row1 .idx{font-family:var(--num);font-size:10px;letter-spacing:1px;color:var(--faint)}
+  .row1 .dot{width:6px;height:6px;border-radius:50%;background:#CBD2C9}
+  .row1 .dot.now{background:var(--primary);box-shadow:0 0 0 3px rgba(79,125,102,.13)}
+  .row1 .dot.ok{background:var(--ok)}
+  .row1 .dot.warn{background:var(--warn)}
+  .drug{margin-top:9px;font-size:12.5px;font-weight:600;line-height:1.42;color:#243330}
+  .drug em{display:block;font-style:normal;font-size:10.5px;color:var(--muted);font-weight:400;margin-top:2px}
+  .c8 .foot{margin-top:auto;display:flex;align-items:flex-end;justify-content:space-between;gap:6px}
+  .qty{font-family:var(--num);font-size:18px;font-weight:600;color:var(--primary);line-height:1}
+  .qty small{font-size:9.5px;font-weight:400;color:var(--muted);margin-left:2px;font-family:var(--sans)}
+  .tm{font-size:9.5px;color:var(--faint);text-align:right;line-height:1.45}
+  .tm b{display:block;font-weight:500;color:var(--sub);font-size:10px}
+  /* 盖子：点击翻开 */
+  .lid{position:absolute;inset:-1px;border-radius:12px;background:#FDFCF7;border:1px solid #E6DFCF;
+    padding:10px 11px;display:flex;flex-direction:column;transform-origin:top center;
+    transition:transform .42s cubic-bezier(.32,.72,.24,1),opacity .3s ease .05s;
+    backface-visibility:hidden;z-index:2}
+  .cell.open .lid{transform:rotateX(-102deg);opacity:0}
+  .lid-top{display:flex;align-items:flex-start;justify-content:space-between}
+  .lid .n{font-family:var(--num);font-size:26px;font-weight:600;color:#D2D5C9;line-height:1}
+  .lid .lttm{font-family:var(--num);font-size:10px;color:#C3C8BC;letter-spacing:.5px;margin-top:4px}
+  .pillar{display:flex;gap:4px;margin-top:12px;min-height:16px}
+  .pillar i{width:8px;height:16px;border-radius:4px;background:#EDE7D8;border:1px solid #E0D9C7}
+  .lid .lt{margin-top:auto;font-size:9.5px;color:var(--faint);letter-spacing:.3px;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .lid .lbar{height:3px;border-radius:2px;background:#EDE7D8;margin-top:7px;overflow:hidden}
+  .lid .lbar i{display:block;height:100%;background:#D9D2BE}
+  .tap-hint{text-align:center;margin-top:16px;font-size:11.5px;color:var(--faint)}
+  .tap-hint b{color:var(--primary);font-weight:500}
+
+  /* ---------- 图文块 ---------- */
+  .feat{padding:24px 0}
+  .feat+.feat{border-top:1px solid var(--line-soft)}
+  .feat h3{font-size:18.5px;line-height:1.5;font-weight:600;letter-spacing:-.3px;color:#1C2925;margin-top:9px}
+  .feat p{margin-top:11px;font-size:12.5px;line-height:1.95;color:var(--sub)}
+  .feat ul{margin:13px 0 0;list-style:none;display:flex;flex-direction:column;gap:8px}
+  .feat li{position:relative;padding-left:15px;font-size:12px;line-height:1.7;color:#3B4743}
+  .feat li::before{content:"";position:absolute;left:0;top:6px;width:5px;height:5px;border-radius:50%;background:#9FBDB3}
+  .fig{margin-top:16px;background:#F4F1E8;border:1px solid #E7E1D2;border-radius:16px;padding:13px}
+
+  /* 小卡 */
+  .mk{background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px;
+    box-shadow:0 18px 34px -30px rgba(33,43,40,.6)}
+  .mk-h{display:flex;align-items:center;justify-content:space-between;font-size:10.5px;color:var(--muted);
+    padding-bottom:10px;border-bottom:1px solid var(--line-soft)}
+  .mk-h b{font-size:12px;color:var(--ink);font-weight:600}
+  .mk-row{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid #F5F1E7;font-size:11.5px}
+  .mk-row:last-child{border-bottom:none;padding-bottom:1px}
+  .mk-row .t{font-family:var(--num);color:var(--muted);font-size:11px;width:34px;flex:none}
+  .mk-row .n{flex:1;min-width:0;color:#2B3835;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .mk-row .s{font-size:10.5px;color:var(--ok);flex:none}
+  .mk-row .s.wait{color:var(--warn)}
+  .wave{display:flex;align-items:flex-end;gap:2.5px;height:38px;margin:14px 0 11px}
+  .wave i{flex:1;background:#DBE6E1;border-radius:2px;height:30%}
+  .wave i:nth-child(3n){height:62%}
+  .wave i:nth-child(4n){height:88%}
+  .wave i:nth-child(5n){height:46%}
+  .wave.on i{background:#9FC0B5;animation:wv .9s ease-in-out infinite alternate}
+  @keyframes wv{from{opacity:.55}to{opacity:1}}
+  .mk-voice{display:flex;align-items:center;gap:10px}
+  .mk-voice .txt{flex:1;min-width:0;font-size:11.5px;line-height:1.65;color:#2B3835}
+  .mk-voice .txt b{font-weight:600}
+  .mk-voice .txt span{display:block;font-size:10px;color:var(--muted);margin-top:3px}
+  .mk-play{width:38px;height:38px;border-radius:50%;background:var(--primary);flex:none;
+    display:grid;place-items:center;box-shadow:0 10px 20px -12px rgba(79,125,102,.9)}
+  .mk-play:active{background:var(--primary-deep)}
+  .mk-play svg{width:13px;height:13px;fill:#fff}
+  .mk-note{margin-top:10px;display:flex;align-items:center;gap:6px;font-size:10px;color:var(--muted)}
+  .mk-note i{width:5px;height:5px;border-radius:50%;background:#9FBDB3;flex:none}
+  .wrow{display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid #F5F1E7;font-size:11.5px}
+  .wrow:last-child{border-bottom:none;padding-bottom:1px}
+  .wrow .bd{width:7px;height:7px;border-radius:50%;flex:none}
+  .wrow .bd.b{background:var(--bad)}
+  .wrow .bd.w{background:var(--warn)}
+  .wrow .nm{flex:1;min-width:0;color:#2B3835;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .wrow .vl{font-size:10.5px;color:var(--muted);flex:none}
+
+  /* ---------- 老人端 ---------- */
+  .elder-txt h3{font-size:21px;line-height:1.46;font-weight:600;letter-spacing:-.4px;margin-top:11px}
+  .elder-txt p{margin-top:11px;font-size:12.5px;line-height:1.95}
+  .elist{margin-top:16px;display:flex;flex-direction:column;gap:10px}
+  .elist div{position:relative;padding-left:16px;font-size:12px;line-height:1.7;color:#D3E4DE}
+  .elist div::before{content:"";position:absolute;left:0;top:6px;width:5px;height:5px;border-radius:50%;background:#7FB3A4}
+  .ph{margin-top:22px;background:#FCFAF3;border-radius:18px;padding:16px 15px;
+    box-shadow:0 24px 44px -26px rgba(0,0,0,.55)}
+  .ph-t{display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--muted)}
+  .ph-t b{font-family:var(--num);font-size:12.5px;color:var(--ink)}
+  .ph-d{margin-top:12px;text-align:center;font-size:11px;color:var(--muted);letter-spacing:.3px}
+  .ph-n{font-family:var(--num);font-size:44px;font-weight:600;color:#1C2925;
+    letter-spacing:-1.2px;text-align:center;line-height:1.1;margin:1px 0 5px}
+  .ph-drug{text-align:center;font-size:11.5px;line-height:1.7;color:var(--sub)}
+  .ph-big{margin-top:13px;height:60px;border-radius:15px;background:var(--primary);color:#fff;
+    display:grid;place-items:center;font-size:18px;font-weight:600;
+    box-shadow:0 14px 26px -16px rgba(79,125,102,.9)}
+  .ph-big:active{background:var(--primary-deep)}
+  .ph-sub{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+  .ph-sub button{height:42px;border:1px solid var(--line);border-radius:12px;background:#fff;
+    font-size:12.5px;color:var(--ink)}
+  .ph-sub button:active{background:#F5F1E7}
+
+  /* ---------- 引言 ---------- */
+  .quote{text-align:center}
+  .quote p{font-size:15px;line-height:1.95;color:#243330;font-weight:500;letter-spacing:-.2px}
+  .quote span{display:block;margin-top:14px;font-size:11px;color:var(--faint)}
+
+  /* ---------- FAQ ---------- */
+  .faq{border-bottom:1px solid var(--line-soft)}
+  .faq summary{list-style:none;cursor:pointer;padding:15px 0;font-size:13px;font-weight:500;
+    color:#243330;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;line-height:1.6}
+  .faq summary::-webkit-details-marker{display:none}
+  .faq summary::after{content:"+";color:var(--faint);font-size:17px;line-height:1.2;flex:none}
+  .faq[open] summary::after{content:"\2212"}
+  .faq p{font-size:12px;line-height:1.9;color:var(--sub);padding:0 0 15px}
+
+  /* ---------- 入口 ---------- */
+  .entry{display:flex;flex-direction:column;gap:11px;margin-top:20px}
+  .ec{background:#fff;border:1px solid var(--line);border-radius:16px;padding:17px 16px;
+    box-shadow:0 16px 34px -30px rgba(75,60,45,.9)}
+  .ec .tg{display:inline-flex;align-items:center;height:20px;padding:0 8px;border-radius:6px;
+    font-size:10px;letter-spacing:.8px;color:var(--muted);background:#F5F2EA;border:1px solid var(--line)}
+  .ec h4{font-size:16px;font-weight:600;margin:10px 0 7px;color:#1C2925}
+  .ec p{font-size:12px;line-height:1.85;color:var(--sub);margin-bottom:14px}
+  .ec .btn{height:46px;font-size:14.5px;width:100%}
+  .ec.dk{background:#2C5A53;border-color:#2C5A53}
+  .ec.dk .tg{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.18);color:#A9C6BD}
+  .ec.dk h4{color:#fff}
+  .ec.dk p{color:#B9CFC8}
+  .ec.dk .btn.gho{background:transparent;border-color:rgba(255,255,255,.34);color:#fff}
+  .ec.dk .btn.gho:active{background:rgba(255,255,255,.08)}
+
+  /* ---------- 页脚 ---------- */
+  .lp-foot{padding:26px 20px calc(30px + var(--safe-b));text-align:center;
+    font-size:10.5px;line-height:1.9;color:var(--faint)}
+</style>
+</head>
+<body>
+
+<!-- 顶栏 -->
+<header class="bar">
+  <div class="brand">
+    <span class="mk">
+      <svg viewBox="0 0 24 24" fill="none" stroke-linejoin="round"><path d="M2.9 11.1 12 6l9.1 5.1-9.1 5.1Z" fill="#DCEBE5" stroke="#275A54" stroke-width="1.25"/><path d="M2.9 11.1 12 16.2v4.5L2.9 15.6Z" fill="#4F7D66" stroke="#275A54" stroke-width="1.25"/><path d="M21.1 11.1 12 16.2v4.5l9.1-5.1Z" fill="#4F7D66" stroke="#275A54" stroke-width="1.25"/><rect x="8.6" y="9.9" width="4.6" height="2.2" rx="1.1" transform="rotate(-28 8.6 9.9)" fill="#fff" stroke="#8FB4A6" stroke-width=".7"/></svg>
+    </span>
+    安心格
+  </div>
+  <button class="act" type="button" onclick="goLogin()">登录</button>
+</header>
+
+<div class="wrap">
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="kicker">慢病用药管理 · 家属协同</div>
+    <h1>把每一粒药，<br>都交到<i>对的时间</i>。</h1>
+    <p class="lead">八个格位按时开合，家人录音准时播报，效期提前一个月提醒。<br>让独居的父母不漏服，也让远方的子女心里有底。</p>
+
+    <div class="ctas">
+      <button class="btn pri" type="button" onclick="goLogin()">
+        进入子女端
+        <svg class="ic" viewBox="0 0 24 24"><path d="M5 12h13M13 6l6 6-6 6"/></svg>
+      </button>
+      <button class="btn gho" type="button" onclick="goElder()">老人端</button>
+    </div>
+    <p class="hint">安心格 AnCareBox · 传智杯参赛作品 · 演示环境</p>
+
+    <!-- 药箱 -->
+    <div class="stage">
+      <div class="dev">
+        <div class="dev-top">
+          <span class="dev-name">客厅药箱 · 在线</span>
+          <span class="dev-clock">12:04</span>
+        </div>
+        <div class="dev-grid">
+          <i>1</i><i>2</i><i>3</i><i class="hot">4</i><i>5</i><i>6</i><i>7</i><i>8</i>
+        </div>
+        <div class="dev-foot">
+          <span>语音提醒 12:30</span>
+          <span>7 天分装 · 已使用 3 天</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="tags">
+      <div class="tagc">
+        <span>下一次服药</span>
+        <b>12:30</b>
+        <small>4 号格 · 午餐后</small>
+      </div>
+      <div class="tagc">
+        <span>刚刚</span>
+        <b class="txt">4 号格已取药</b>
+        <small>09:12 · 自动核销</small>
+      </div>
+    </div>
+
+    <div class="strip">
+      <div><b>96.4%</b><span>近 7 日按时服药率</span></div>
+      <div><b>8 格</b><span>分装与自动核销</span></div>
+      <div><b>30 天</b><span>效期提前预警</span></div>
+      <div><b>4 端</b><span>电脑 · 手机 · 老人端 · 药箱</span></div>
+    </div>
+  </section>
+
+  <!-- 01 八格分装 -->
+  <section class="sec white" id="c8">
+    <div class="head">
+      <div class="kicker">01 — 八格分装</div>
+      <h2>格子盖着的时候是封闭的，<br>打开才看得见还剩几片。</h2>
+      <p class="sub2">家属端看到的是同一份数据：哪一格在哪一刻被取走、剩多少、有没有重复服用。</p>
+    </div>
+
+    <div class="c8">
+      <div class="cell">
+        <div class="cb">
+          <div class="row1"><span class="idx">01</span><span class="dot ok"></span></div>
+          <div class="drug">氨氯地平 5mg<em>早餐后</em></div>
+          <div class="foot"><span class="qty">1<small>片</small></span><span class="tm"><b>07:00</b>已服用</span></div>
+        </div>
+        <div class="lid">
+          <div class="lid-top"><span class="n">1</span><span class="lttm">07:00</span></div>
+          <div class="pillar"><i></i></div>
+          <span class="lt">已封盖</span>
+          <span class="lbar"><i style="width:100%"></i></span>
+        </div>
+      </div>
+
+      <div class="cell">
+        <div class="cb">
+          <div class="row1"><span class="idx">02</span><span class="dot"></span></div>
+          <div class="drug">甲钴胺 0.5mg<em>午餐后</em></div>
+          <div class="foot"><span class="qty">1<small>片</small></span><span class="tm"><b>12:30</b>待服用</span></div>
+        </div>
+        <div class="lid">
+          <div class="lid-top"><span class="n">2</span><span class="lttm">12:30</span></div>
+          <div class="pillar"><i></i></div>
+          <span class="lt">已封盖</span>
+          <span class="lbar"><i style="width:100%"></i></span>
+        </div>
+      </div>
+
+      <div class="cell">
+        <div class="cb">
+          <div class="row1"><span class="idx">03</span><span class="dot"></span></div>
+          <div class="drug">维生素 D3<em>午餐后</em></div>
+          <div class="foot"><span class="qty">1<small>粒</small></span><span class="tm"><b>12:30</b>待服用</span></div>
+        </div>
+        <div class="lid">
+          <div class="lid-top"><span class="n">3</span><span class="lttm">12:30</span></div>
+          <div class="pillar"><i></i></div>
+          <span class="lt">已封盖</span>
+          <span class="lbar"><i style="width:100%"></i></span>
+        </div>
+      </div>
+
+      <div class="cell open">
+        <div class="cb">
+          <div class="row1"><span class="idx">04</span><span class="dot now"></span></div>
+          <div class="drug">二甲双胍缓释片<em>＋ 维生素 D3 · 午餐后</em></div>
+          <div class="foot"><span class="qty">2<small>片</small></span><span class="tm"><b>12:30</b>26 分钟后</span></div>
+        </div>
+        <div class="lid">
+          <div class="lid-top"><span class="n">4</span><span class="lttm">12:30</span></div>
+          <div class="pillar"><i></i><i></i></div>
+          <span class="lt">已封盖</span>
+          <span class="lbar"><i style="width:100%"></i></span>
+        </div>
+      </div>
+
+      <div class="cell">
+        <div class="cb">
+          <div class="row1"><span class="idx">05</span><span class="dot"></span></div>
+          <div class="drug">阿托伐他汀 20mg<em>睡前</em></div>
+          <div class="foot"><span class="qty">1<small>片</small></span><span class="tm"><b>21:00</b>待服用</span></div>
+        </div>
+        <div class="lid">
+          <div class="lid-top"><span class="n">5</span><span class="lttm">21:00</span></div>
+          <div class="pillar"><i></i></div>
+          <span class="lt">已封盖</span>
+          <span class="lbar"><i style="width:100%"></i></span>
+        </div>
+      </div>
+
+      <div class="cell">
+        <div class="cb">
+          <div class="row1"><span class="idx">06</span><span class="dot"></span></div>
+          <div class="drug">银杏叶片<em>睡前</em></div>
+          <div class="foot"><span class="qty">2<small>片</small></span><span class="tm"><b>21:00</b>待服用</span></div>
+        </div>
+        <div class="lid">
+          <div class="lid-top"><span class="n">6</span><span class="lttm">21:00</span></div>
+          <div class="pillar"><i></i><i></i></div>
+          <span class="lt">已封盖</span>
+          <span class="lbar"><i style="width:100%"></i></span>
+        </div>
+      </div>
+
+      <div class="cell">
+        <div class="cb">
+          <div class="row1"><span class="idx">07</span><span class="dot"></span></div>
+          <div class="drug">碳酸钙 D3<em>睡前</em></div>
+          <div class="foot"><span class="qty">1<small>片</small></span><span class="tm"><b>21:00</b>待服用</span></div>
+        </div>
+        <div class="lid">
+          <div class="lid-top"><span class="n">7</span><span class="lttm">21:00</span></div>
+          <div class="pillar"><i></i></div>
+          <span class="lt">已封盖</span>
+          <span class="lbar"><i style="width:100%"></i></span>
+        </div>
+      </div>
+
+      <div class="cell">
+        <div class="cb">
+          <div class="row1"><span class="idx">08</span><span class="dot warn"></span></div>
+          <div class="drug">空格 · 待分装<em>明日 20:00 前补齐</em></div>
+          <div class="foot"><span class="qty">0<small>片</small></span><span class="tm"><b>—</b>未分装</span></div>
+        </div>
+        <div class="lid">
+          <div class="lid-top"><span class="n">8</span><span class="lttm">—</span></div>
+          <div class="pillar"></div>
+          <span class="lt">空置</span>
+          <span class="lbar"><i style="width:0"></i></span>
+        </div>
+      </div>
+    </div>
+
+    <p class="tap-hint">点一格，<b>看看盖子下面是什么</b></p>
+  </section>
+
+  <!-- 02 产品能力 -->
+  <section class="sec tint" id="feats">
+    <div class="head">
+      <div class="kicker">02 — 产品能力</div>
+      <h2>不是多一块屏幕，<br>而是把吃药这件事接住了。</h2>
+    </div>
+
+    <div class="feat">
+      <div class="kicker">取药即核销</div>
+      <h3>从提醒到记录，中间不需要有人记得。</h3>
+      <p>到点播报、开盖取药、自动记一笔。漏服与重复服药都会留痕，家属端一屏看全一周的节奏。</p>
+      <ul>
+        <li>开盖动作触发核销，不依赖老人点确认</li>
+        <li>同一格 30 分钟内二次开盖，标记为重复服药</li>
+        <li>未取药 15 分钟后升级提醒，并通知家属</li>
+      </ul>
+      <div class="fig">
+        <div class="mk">
+          <div class="mk-h"><b>今日提醒记录</b><span>周四</span></div>
+          <div class="mk-row"><span class="t">07:00</span><span class="n">氨氯地平 5mg</span><span class="s">已服用</span></div>
+          <div class="mk-row"><span class="t">12:30</span><span class="n">二甲双胍 ＋ D3</span><span class="s wait">待服用</span></div>
+          <div class="mk-row"><span class="t">18:40</span><span class="n">语音提醒已播报</span><span class="s">已送达</span></div>
+          <div class="mk-row"><span class="t">21:00</span><span class="n">阿托伐他汀 20mg</span><span class="s" style="color:var(--faint)">未到时间</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="feat">
+      <div class="kicker">家人录音</div>
+      <h3>把儿女的声音，放进药箱。</h3>
+      <p>家属录一段 20 秒的提醒，方言也可以。到点由药箱喇叭播报，老人听到熟悉的声音，比听机器音更愿意动身。</p>
+      <ul>
+        <li>儿子的声音 / 女儿的声音，各自独立录制</li>
+        <li>老人端一键重听，不用翻菜单</li>
+        <li>录音只存在家庭组内，可随时删除</li>
+      </ul>
+      <div class="fig">
+        <div class="mk">
+          <div class="mk-h"><b>女儿的声音 · 12:30</b><span>0:06</span></div>
+          <div class="wave" id="wave"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <div class="mk-voice">
+            <div class="txt">
+              <b>“妈，吃完午饭记得吃 4 号格的药。”</b>
+              <span>已播报 · 09 月 22 日录制</span>
+            </div>
+            <button class="mk-play" type="button" id="voicePlay" aria-label="试听">
+              <svg viewBox="0 0 24 24"><path d="M8 5l11 7-11 7z"/></svg>
+            </button>
+          </div>
+          <p class="mk-note"><i></i><span id="voiceNote">机器合成女声 · 点右侧按钮试听</span></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="feat">
+      <div class="kicker">效期预警</div>
+      <h3>提前一个月，就知道该补哪一盒。</h3>
+      <p>按每日用量倒推剩余天数，临期 30 天标黄、过期标红，并直接生成一份可下单的购药清单。</p>
+      <ul>
+        <li>库存与分装联动，不靠人工盘点</li>
+        <li>过期药品单独标记，提示按社区方式回收</li>
+        <li>清单可导出，交给家人或家庭医生</li>
+      </ul>
+      <div class="fig">
+        <div class="mk">
+          <div class="mk-h"><b>库存预警</b><span>3 项待处理</span></div>
+          <div class="wrow"><span class="bd b"></span><span class="nm">布洛芬缓释胶囊</span><span class="vl">已过期</span></div>
+          <div class="wrow"><span class="bd w"></span><span class="nm">氨氯地平 5mg</span><span class="vl">剩 6 片</span></div>
+          <div class="wrow"><span class="bd w"></span><span class="nm">碳酸钙 D3</span><span class="vl">剩 9 片</span></div>
+          <div class="wrow"><span class="bd" style="background:#CBD2C9"></span><span class="nm">维生素 D3</span><span class="vl">剩 28 粒</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 适老化 -->
+  <section class="sec dark" id="elder">
+    <div class="elder-txt">
+      <div class="kicker">03 — 适老化</div>
+      <h3>给父母的界面，<br>只需要两个大按钮。</h3>
+      <p>不切换页面、不点小人图标。打开就是“下一次吃药”，字号放大到不戴老花镜也看得清。</p>
+      <div class="elist">
+        <div>整屏只有一件事：现在该吃什么</div>
+        <div>一键重听儿女录音，方言也听得懂</div>
+        <div>“叫一下家人”直接拨通，不用找号码</div>
+      </div>
+
+      <div class="ph">
+        <div class="ph-t"><b>12:04</b><span>8 月 22 日 周四</span></div>
+        <div class="ph-d">下一次服药 · 26 分钟后</div>
+        <div class="ph-n">12:30</div>
+        <div class="ph-drug">二甲双胍缓释片 0.5g ×1<br>＋ 维生素 D3 ×1 · 4 号格</div>
+        <div class="ph-big" id="mockTaken">我已服药</div>
+        <div class="ph-sub">
+          <button type="button" id="mockRetry">重听提醒</button>
+          <button type="button" id="mockCall">叫一下家人</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 引言 -->
+  <section class="sec">
+    <div class="quote">
+      <p>“头两周我妈老嫌它吵，说不如我打电话。后来换成我妹录的那句「妈，该吃药了」，她就不吭声了，比我催管用。”</p>
+      <span>家属端用户 · 河南郑州 · 用了三个月</span>
+    </div>
+  </section>
+
+  <!-- 05 FAQ -->
+  <section class="sec white" id="faq">
+    <div class="head">
+      <div class="kicker">05 — 常见问题</div>
+      <h2>装之前，先问清楚。</h2>
+    </div>
+    <div class="faqs">
+      <details class="faq" open>
+        <summary>家里老人不会用手机，能用吗？</summary>
+        <p>老人端只需要点一个按钮。药箱本身不依赖手机——到点自动播报，开盖自动核销，老人的手机可以只是放在旁边。</p>
+      </details>
+      <details class="faq">
+        <summary>八个格子够用吗？</summary>
+        <p>八格对应一天最多四次的用药安排，按周分装。药品种类多的家庭可以先在库存里登记，再决定哪些进格、哪些留在原盒。</p>
+      </details>
+      <details class="faq">
+        <summary>录音和服药记录谁能看到？</summary>
+        <p>只对家庭组成员可见，不采集位置、不做广告推送。家属看到的是服药记录与库存，看不到与用药无关的信息。</p>
+      </details>
+      <details class="faq">
+        <summary>药箱断电或者断网了怎么办？</summary>
+        <p>断网时按本地时间继续播报与记录，恢复后自动补传；断电后重新上电即恢复原计划，已完成的记录不会重复。</p>
+      </details>
+    </div>
+  </section>
+
+  <!-- 06 开始使用 -->
+  <section class="sec">
+    <div class="head">
+      <div class="kicker">06 — 开始使用</div>
+      <h2>从哪一端进去，都可以。</h2>
+      <p class="sub2">子女管理分装与提醒，父母只需要按一下。手机端、电脑端、老人端共用同一个家庭组与同一份数据。</p>
+    </div>
+
+    <div class="entry">
+      <div class="ec">
+        <span class="tg">子女端</span>
+        <h4>进入子女端</h4>
+        <p>总览、服药计划、库存预警、提醒记录、告警中心、语音提醒、AI 助手、家庭成员，一屏协同。</p>
+        <button class="btn pri" type="button" onclick="goLogin()">
+          登录进入
+          <svg class="ic" viewBox="0 0 24 24"><path d="M5 12h13M13 6l6 6-6 6"/></svg>
+        </button>
+      </div>
+      <div class="ec dk">
+        <span class="tg">老人端</span>
+        <h4>进入老人端</h4>
+        <p>大字号、两个大按钮、方言提醒。打开就是“下一次吃药”，不需要学新东西。</p>
+        <button class="btn gho" type="button" onclick="goElder()">用 6 位绑定码进入</button>
+      </div>
+    </div>
+  </section>
+
+  <footer class="lp-foot">
+    安心格 AnCareBox · 家庭用药安全<br>
+    传智杯参赛作品 · 页面数据均为示例值<br>
+    只做提醒、记录与科普，不诊断、不开处方
+  </footer>
+
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  window.goLogin = function () { location.href = '/m/login.html'; };
+  window.goElder = function () { location.href = '/m/elder.html'; };
+
+  /* 八格：手机上用点击翻开盖子（hover 在触屏不可靠） */
+  var cells = document.querySelectorAll('.c8 .cell');
+  Array.prototype.forEach.call(cells, function (cell) {
+    cell.addEventListener('click', function () {
+      var isOpen = cell.classList.contains('open');
+      // 一次只开一个，避免整屏都翻开反而看不出层次
+      Array.prototype.forEach.call(cells, function (c) { c.classList.remove('open'); });
+      if (!isOpen) cell.classList.add('open');
+    });
+  });
+
+  /* 语音试听：用浏览器合成音，只做体验示意，不冒充真人录音 */
+  var synth = window.speechSynthesis;
+  var playBtn = document.getElementById('voicePlay');
+  var note = document.getElementById('voiceNote');
+  var wave = document.getElementById('wave');
+  var TEXT = '妈，吃完午饭记得吃四号格的药。';
+  var IDLE = '机器合成女声 · 点右侧按钮试听';
+  var playing = false;
+
+  function stopWave() {
+    playing = false;
+    if (wave) wave.classList.remove('on');
+    if (note) note.textContent = IDLE;
+  }
+
+  if (playBtn && synth) {
+    playBtn.addEventListener('click', function () {
+      if (playing) { synth.cancel(); stopWave(); return; }
+      synth.cancel();
+      var u = new SpeechSynthesisUtterance(TEXT);
+      u.lang = 'zh-CN';
+      u.rate = 0.92;
+      u.onstart = function () {
+        playing = true;
+        if (wave) wave.classList.add('on');
+        if (note) note.textContent = '正在播放合成语音…';
+      };
+      u.onend = stopWave;
+      u.onerror = function () {
+        stopWave();
+        if (note) note.textContent = '当前浏览器不支持语音合成，真机由药箱喇叭播报';
+      };
+      synth.speak(u);
+    });
+  } else if (playBtn && note) {
+    playBtn.addEventListener('click', function () {
+      note.textContent = '当前浏览器不支持语音合成，真机由药箱喇叭播报';
+    });
+  }
+
+  /* 老人端示意按钮：给出可见反馈，不做假跳转 */
+  var taken = document.getElementById('mockTaken');
+  if (taken) {
+    taken.addEventListener('click', function () {
+      taken.textContent = '已记录 · 辛苦了';
+      taken.style.background = '#3E6851';
+    });
+  }
+})();
+</script>
+</body>
+</html>
