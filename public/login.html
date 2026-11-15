@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>登录 · 安心格 AnCareBox</title>
+<link rel="stylesheet" href="/css/style.css?v=20261106e">
+<link rel="stylesheet" href="/css/login.css?v=20261102a">
+</head>
+<body class="login-page">
+
+<div class="auth-shell">
+
+  <!-- 品牌 -->
+  <div class="auth-brand">
+    <span class="mark">
+      <svg class="ic" viewBox="0 0 24 24" fill="none" stroke-linejoin="round"><path d="M2.9 11.1 12 6l9.1 5.1-9.1 5.1Z" fill="#DCEBE5" stroke="#275A54" stroke-width="1.25"/><path d="M2.9 11.1 12 16.2v4.5L2.9 15.6Z" fill="#2F6B63" stroke="#275A54" stroke-width="1.25"/><path d="M21.1 11.1 12 16.2v4.5l9.1-5.1Z" fill="#2F6B63" stroke="#275A54" stroke-width="1.25"/><rect x="8.6" y="9.9" width="4.6" height="2.2" rx="1.1" transform="rotate(-28 8.6 9.9)" fill="#fff" stroke="#7FA79C" stroke-width=".7"/></svg>
+    </span>
+    <div><b>安心格 AnCareBox</b><span>家庭用药协同系统</span></div>
+  </div>
+
+  <!-- 登录 / 注册卡片 -->
+  <div class="auth-card" id="authCard" data-mode="login">
+    <div class="ah">
+      <div>
+        <b id="authTitle">登录安心格</b>
+        <span id="authSub">登录后进入子女端控制台</span>
+      </div>
+    </div>
+
+    <!-- 登录 -->
+    <form id="loginForm">
+      <div class="auth-field">
+        <label>账号</label>
+        <input id="username" type="text" autocomplete="username" placeholder="请输入账号">
+      </div>
+      <div class="auth-field">
+        <label>密码</label>
+        <input id="password" type="password" autocomplete="current-password" placeholder="请输入密码">
+      </div>
+      <p class="auth-err" id="loginErr"></p>
+      <button class="auth-btn" type="submit" id="btnLogin">登 录</button>
+      <p class="auth-switch">还没有账号？<a id="toReg">现在就注册</a></p>
+    </form>
+
+    <!-- 注册 -->
+    <form id="regForm" novalidate>
+      <div class="auth-field">
+        <label>账号</label>
+        <input id="regUsername" type="text" placeholder="字母、数字或下划线，3-20 位">
+      </div>
+      <div class="auth-field">
+        <label>密码</label>
+        <input id="regPassword" type="password" placeholder="至少 6 位">
+      </div>
+      <div class="auth-field">
+        <label>家庭名称</label>
+        <input id="regFamily" type="text" placeholder="如：王家">
+      </div>
+      <div class="auth-field">
+        <label>您的姓名</label>
+        <input id="regRealName" type="text" placeholder="如：王大明">
+      </div>
+      <p class="auth-err" id="regErr"></p>
+      <button class="auth-btn" type="submit" id="btnReg">注册并登录</button>
+      <p class="auth-switch">已有账号？<a id="toLogin">返回登录</a></p>
+    </form>
+  </div>
+
+  <!-- 演示账号 -->
+  <div class="auth-card demo">
+    <h3>演示账号 <span style="font-size:12px;color:var(--muted);font-weight:400;margin-left:6px">点一下自动填充</span></h3>
+    <div class="demo-list">
+      <button class="demo-item" data-u="wang_owner">
+        <b>wang_owner</b><span>王家 · owner 主配置人</span>
+      </button>
+      <button class="demo-item" data-u="wang_member">
+        <b>wang_member</b><span>王家 · member 可配置</span>
+      </button>
+      <button class="demo-item" data-u="li_owner">
+        <b>li_owner</b><span>李家 · 用于验证越权拦截</span>
+      </button>
+    </div>
+    <p class="demo-tip">
+      三个账号密码相同，均为 <code>medbox2026</code>。
+      用 <b>li_owner</b> 登录后会发现：只能看到李奶奶，看不到王家老人 —— 这就是家庭数据隔离。
+    </p>
+  </div>
+
+  <p class="login-foot">
+    老人端请在另一台设备打开 <a href="/elder.html" target="_blank">/elder.html</a>，用绑定码登录，无需密码。
+    &nbsp;·&nbsp;<a href="/landing.html">返回产品介绍</a>
+  </p>
+
+</div>
+
+<script src="/js/api.js?v=20261106b"></script>
+<script>
+(function () {
+  var DEMO_PWD = 'medbox2026';
+
+  function err(id, msg) {
+    var el = document.getElementById(id);
+    el.textContent = msg || '';
+    el.style.display = msg ? 'block' : 'none';
+  }
+
+  // 登录后跳回原来要去的页面
+  function fromParam() {
+    var m = location.search.match(/[?&]from=([^&]+)/);
+    return m ? decodeURIComponent(m[1]) : '/index.html';
+  }
+  function afterLogin(data) {
+    api.setToken(data.accessToken);
+    // 登录/注册成功：当前页直接跳转到子女端（不新开标签页）
+    location.href = fromParam();
+  }
+
+  // 登录
+  document.getElementById('loginForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    err('loginErr');
+    var u = document.getElementById('username').value.trim();
+    var p = document.getElementById('password').value;
+    if (!u || !p) return err('loginErr', '请输入账号和密码');
+
+    var btn = document.getElementById('btnLogin');
+    btn.disabled = true;
+    btn.textContent = '登录中...';
+
+    // 登录接口不走 api.post，避免 401 时误触发续期逻辑
+    fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ username: u, password: p }),
+    })
+      .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
+      .then(function (res) {
+        if (!res.ok) {
+          err('loginErr', res.d.error || '登录失败');
+          btn.disabled = false;
+          btn.textContent = '登 录';
+          return;
+        }
+        afterLogin(res.d);
+      })
+      .catch(function (e) {
+        err('loginErr', '网络异常：' + e.message);
+        btn.disabled = false;
+        btn.textContent = '登 录';
+      });
+  });
+
+  // 回车登录
+  document.getElementById('password').addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') document.getElementById('loginForm').requestSubmit();
+  });
+
+  // 演示账号一键填充
+  document.querySelectorAll('.demo-item').forEach(function (it) {
+    it.addEventListener('click', function () {
+      document.getElementById('username').value = this.getAttribute('data-u');
+      document.getElementById('password').value = DEMO_PWD;
+      err('loginErr');
+    });
+  });
+
+  // 登录 / 注册切换
+  function switchMode(mode) {
+    document.getElementById('authCard').setAttribute('data-mode', mode);
+    err('loginErr'); err('regErr');
+    document.getElementById('authTitle').textContent = mode === 'reg' ? '注册安心格' : '登录安心格';
+    document.getElementById('authSub').textContent = mode === 'reg'
+      ? '注册后自动创建一个新家庭，并成为主配置人'
+      : '登录后进入子女端控制台';
+  }
+  document.getElementById('toReg').addEventListener('click', function () { switchMode('reg'); });
+  document.getElementById('toLogin').addEventListener('click', function () { switchMode('login'); });
+
+  // 注册
+  document.getElementById('regForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    err('regErr');
+    var body = {
+      username: document.getElementById('regUsername').value.trim(),
+      password: document.getElementById('regPassword').value,
+      familyName: document.getElementById('regFamily').value.trim(),
+      realName: document.getElementById('regRealName').value.trim(),
+    };
+    if (!body.username || !body.password) return err('regErr', '账号和密码必填');
+
+    var btn = document.getElementById('btnReg');
+    btn.disabled = true;
+    btn.textContent = '注册中...';
+
+    fetch('/api/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify(body),
+    })
+      .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
+      .then(function (res) {
+        if (!res.ok) {
+          err('regErr', res.d.error || '注册失败');
+          btn.disabled = false;
+          btn.textContent = '注册并登录';
+          return;
+        }
+        afterLogin(res.d);
+      })
+      .catch(function (e) {
+        err('regErr', '网络异常：' + e.message);
+        btn.disabled = false;
+        btn.textContent = '注册并登录';
+      });
+  });
+})();
+</script>
+</body>
+</html>

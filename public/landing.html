@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>安心格 AnCareBox · 把每一粒药，交到对的时间</title>
+<link rel="stylesheet" href="/css/style.css?v=20261106e">
+</head>
+<body>
+
+<!-- ============ 介绍页（长页落地） ============ -->
+<div class="lp">
+
+  <header class="lp-nav">
+    <div class="lp-wrap">
+      <div class="lp-brand">
+        <span class="mark">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke-linejoin="round"><path d="M2.9 11.1 12 6l9.1 5.1-9.1 5.1Z" fill="#DCEBE5" stroke="#275A54" stroke-width="1.25"/><path d="M2.9 11.1 12 16.2v4.5L2.9 15.6Z" fill="#2F6B63" stroke="#275A54" stroke-width="1.25"/><path d="M21.1 11.1 12 16.2v4.5l9.1-5.1Z" fill="#2F6B63" stroke="#275A54" stroke-width="1.25"/><rect x="8.6" y="9.9" width="4.6" height="2.2" rx="1.1" transform="rotate(-28 8.6 9.9)" fill="#fff" stroke="#7FA79C" stroke-width=".7"/></svg>
+        </span>
+        安心格
+      </div>
+      <nav class="lp-tabs">
+        <a href="#lp-c8">八格分装</a>
+        <a href="#lp-feats">产品能力</a>
+        <a href="#lp-elder">适老化</a>
+        <a href="#lp-faq">常见问题</a>
+      </nav>
+      <div class="lp-navact">
+        <button class="lp-mini" onclick="enterElder()">老人端</button>
+        <button class="lp-mini solid" onclick="enterChild()">进入控制台</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="lp-wrap">
+    <div class="lp-hero">
+      <div class="kicker">慢病用药管理 · 家属协同</div>
+      <h1 class="lp-h1">把每一粒药，<br>都交到<i>对的时间</i>。</h1>
+      <p class="lp-lead">八个格位按时开合，家人录音准时播报，效期提前一个月提醒。<br>让独居的父母不漏服，也让远方的子女心里有底。</p>
+      <div class="lp-ctas">
+        <button class="lp-btn pri" onclick="enterChild()">
+          进入子女端控制台
+          <svg class="ic" viewBox="0 0 24 24"><path d="M5 12h13M13 6l6 6-6 6"/></svg>
+        </button>
+        <button class="lp-btn gho" onclick="enterElder()">进入老人端</button>
+      </div>
+      <p class="lp-hint">安心格 AnCareBox · 传智杯参赛作品 · 演示环境</p>
+      <p class="lp-mlink">同一个家庭组，手机上也能用 · <a onclick="enterMobile()">打开移动端</a></p>
+
+      <div class="lp-stage">
+        <div class="stage-tag t1">
+          <span>下一次服药</span>
+          <b>12:30</b>
+          <small>4 号格 · 午餐后</small>
+        </div>
+        <div class="stage-tag t2">
+          <span>刚刚</span>
+          <b class="txt">4 号格已取药</b>
+          <small>09:12 · 自动核销</small>
+        </div>
+        <div class="dev">
+          <div class="dev-top">
+            <span class="dev-name">客厅药箱 · 在线</span>
+            <span class="dev-clock">12:04</span>
+          </div>
+          <div class="dev-grid">
+            <i>1</i><i>2</i><i>3</i><i class="hot">4</i><i>5</i><i>6</i><i>7</i><i>8</i>
+          </div>
+          <div class="dev-foot">
+            <span>语音提醒 12:30</span>
+            <span>7 天分装 · 已使用 3 天</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="lp-strip">
+        <div><b>96.4%</b><span>近 7 日按时服药率</span></div>
+        <div><b>8 格</b><span>分装与自动核销</span></div>
+        <div><b>30 天</b><span>效期提前预警</span></div>
+        <div><b>4 端</b><span>电脑 · 手机 · 老人端 · 药箱</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 01 八格 -->
+  <div class="lp-sec white" id="lp-c8">
+    <div class="lp-wrap">
+      <div class="lp-head">
+        <div class="kicker">01 — 八格分装</div>
+        <h2 class="lp-h2">格子盖着的时候是封闭的，<br>打开才看得见还剩几片。</h2>
+        <p class="lp-sub2">家属端看到的是同一份数据：哪一格在哪一刻被取走、剩多少、有没有重复服用。</p>
+      </div>
+
+      <div class="c8">
+        <div class="cell" tabindex="0">
+          <div class="cb">
+            <div class="row1"><span class="idx">01</span><span class="dot ok"></span></div>
+            <div class="drug">氨氯地平 5mg<em>早餐后</em></div>
+            <div class="foot"><span class="qty">1<small>片</small></span><span class="tm"><b>07:00</b>已服用</span></div>
+          </div>
+          <div class="lid">
+            <div class="lid-top"><span class="n">1</span><span class="tm">07:00</span></div>
+            <div class="pillar"><i></i></div>
+            <span class="lt">已封盖</span>
+            <span class="bar"><i style="width:100%"></i></span>
+          </div>
+        </div>
+
+        <div class="cell" tabindex="0">
+          <div class="cb">
+            <div class="row1"><span class="idx">02</span><span class="dot"></span></div>
+            <div class="drug">甲钴胺 0.5mg<em>午餐后</em></div>
+            <div class="foot"><span class="qty">1<small>片</small></span><span class="tm"><b>12:30</b>待服用</span></div>
+          </div>
+          <div class="lid">
+            <div class="lid-top"><span class="n">2</span><span class="tm">12:30</span></div>
+            <div class="pillar"><i></i></div>
+            <span class="lt">已封盖</span>
+            <span class="bar"><i style="width:100%"></i></span>
+          </div>
+        </div>
+
+        <div class="cell" tabindex="0">
+          <div class="cb">
+            <div class="row1"><span class="idx">03</span><span class="dot"></span></div>
+            <div class="drug">维生素 D3<em>午餐后</em></div>
+            <div class="foot"><span class="qty">1<small>粒</small></span><span class="tm"><b>12:30</b>待服用</span></div>
+          </div>
+          <div class="lid">
+            <div class="lid-top"><span class="n">3</span><span class="tm">12:30</span></div>
+            <div class="pillar"><i></i></div>
+            <span class="lt">已封盖</span>
+            <span class="bar"><i style="width:100%"></i></span>
+          </div>
+        </div>
+
+        <div class="cell" tabindex="0">
+          <div class="cb">
+            <div class="row1"><span class="idx">04</span><span class="dot now"></span></div>
+            <div class="drug">二甲双胍缓释片<em>＋ 维生素 D3 · 午餐后</em></div>
+            <div class="foot"><span class="qty">2<small>片</small></span><span class="tm"><b>12:30</b>26 分钟后</span></div>
+          </div>
+          <div class="lid">
+            <div class="lid-top"><span class="n">4</span><span class="tm">12:30</span></div>
+            <div class="pillar"><i></i><i></i></div>
+            <span class="lt">已封盖</span>
+            <span class="bar"><i style="width:100%"></i></span>
+          </div>
+        </div>
+
+        <div class="cell" tabindex="0">
+          <div class="cb">
+            <div class="row1"><span class="idx">05</span><span class="dot"></span></div>
+            <div class="drug">阿托伐他汀 20mg<em>睡前</em></div>
+            <div class="foot"><span class="qty">1<small>片</small></span><span class="tm"><b>21:00</b>待服用</span></div>
+          </div>
+          <div class="lid">
+            <div class="lid-top"><span class="n">5</span><span class="tm">21:00</span></div>
+            <div class="pillar"><i></i></div>
+            <span class="lt">已封盖</span>
+            <span class="bar"><i style="width:100%"></i></span>
+          </div>
+        </div>
+
+        <div class="cell" tabindex="0">
+          <div class="cb">
+            <div class="row1"><span class="idx">06</span><span class="dot"></span></div>
+            <div class="drug">银杏叶片<em>睡前</em></div>
+            <div class="foot"><span class="qty">2<small>片</small></span><span class="tm"><b>21:00</b>待服用</span></div>
+          </div>
+          <div class="lid">
+            <div class="lid-top"><span class="n">6</span><span class="tm">21:00</span></div>
+            <div class="pillar"><i></i><i></i></div>
+            <span class="lt">已封盖</span>
+            <span class="bar"><i style="width:100%"></i></span>
+          </div>
+        </div>
+
+        <div class="cell" tabindex="0">
+          <div class="cb">
+            <div class="row1"><span class="idx">07</span><span class="dot"></span></div>
+            <div class="drug">碳酸钙 D3<em>睡前</em></div>
+            <div class="foot"><span class="qty">1<small>片</small></span><span class="tm"><b>21:00</b>待服用</span></div>
+          </div>
+          <div class="lid">
+            <div class="lid-top"><span class="n">7</span><span class="tm">21:00</span></div>
+            <div class="pillar"><i></i></div>
+            <span class="lt">已封盖</span>
+            <span class="bar"><i style="width:100%"></i></span>
+          </div>
+        </div>
+
+        <div class="cell" tabindex="0">
+          <div class="cb">
+            <div class="row1"><span class="idx">08</span><span class="dot warn"></span></div>
+            <div class="drug">空格 · 待分装<em>明日 20:00 前补齐</em></div>
+            <div class="foot"><span class="qty">0<small>片</small></span><span class="tm"><b>—</b>未分装</span></div>
+          </div>
+          <div class="lid">
+            <div class="lid-top"><span class="n">8</span><span class="tm">—</span></div>
+            <div class="pillar"></div>
+            <span class="lt">空置</span>
+            <span class="bar"><i style="width:0"></i></span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 02 图文 -->
+  <div class="lp-sec tint" id="lp-feats">
+    <div class="lp-wrap">
+      <div class="lp-head">
+        <div class="kicker">02 — 产品能力</div>
+        <h2 class="lp-h2">不是多一块屏幕，<br>而是把吃药这件事接住了。</h2>
+      </div>
+
+      <div class="lp-feat">
+        <div class="copy">
+          <div class="kicker">取药即核销</div>
+          <h3>从提醒到记录，中间不需要有人记得。</h3>
+          <p>到点播报、开盖取药、自动记一笔。漏服与重复服药都会留痕，家属端一屏看全一周的节奏。</p>
+          <ul>
+            <li>开盖动作触发核销，不依赖老人点确认</li>
+            <li>同一格 30 分钟内二次开盖，标记为重复服药</li>
+            <li>未取药 15 分钟后升级提醒，并通知家属</li>
+          </ul>
+        </div>
+        <div class="fig">
+          <div class="mk">
+            <div class="mk-h"><b>今日提醒记录</b><span>周四</span></div>
+            <div class="mk-row"><span class="t">07:00</span><span class="n">氨氯地平 5mg</span><span class="s">已服用</span></div>
+            <div class="mk-row"><span class="t">12:30</span><span class="n">二甲双胍缓释片 ＋ D3</span><span class="s wait">待服用</span></div>
+            <div class="mk-row"><span class="t">18:40</span><span class="n">语音提醒已播报</span><span class="s">已送达</span></div>
+            <div class="mk-row"><span class="t">21:00</span><span class="n">阿托伐他汀 20mg</span><span class="s">未到时间</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lp-feat rev">
+        <div class="copy">
+          <div class="kicker">家人录音</div>
+          <h3>把儿女的声音，放进药箱。</h3>
+          <p>家属录一段 20 秒的提醒，方言也可以。到点由药箱喇叭播报，老人听到熟悉的声音，比听机器音更愿意动身。</p>
+          <ul>
+            <li>儿子的声音 / 女儿的声音，各自独立录制</li>
+            <li>老人端一键重听，不用翻菜单</li>
+            <li>录音只存在家庭组内，可随时删除</li>
+          </ul>
+        </div>
+        <div class="fig">
+          <div class="mk" id="voiceCard">
+            <div class="mk-h"><b>女儿的声音 · 12:30</b><span>0:06</span></div>
+            <div class="wave">
+              <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+            </div>
+            <div class="mk-voice">
+              <div><b>“妈，吃完午饭记得吃 4 号格的药。”</b><br><span>已播报 · 09 月 22 日录制</span></div>
+              <button class="mk-play" type="button" id="voicePlay" aria-label="试听机器合成女声">
+                <svg class="ic ic-play" viewBox="0 0 24 24"><path d="M8 5l11 7-11 7z"/></svg>
+                <svg class="ic ic-stop" viewBox="0 0 24 24"><rect x="8.6" y="8.6" width="6.8" height="6.8" rx="1.2"/></svg>
+              </button>
+            </div>
+            <p class="mk-note"><i></i><span id="voiceNote">机器合成女声 · 点击右侧按钮试听</span></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="lp-feat">
+        <div class="copy">
+          <div class="kicker">效期预警</div>
+          <h3>提前一个月，就知道该补哪一盒。</h3>
+          <p>按每日用量倒推剩余天数，临期 30 天标黄、过期标红，并直接生成一份可下单的购药清单。</p>
+          <ul>
+            <li>库存与分装联动，不靠人工盘点</li>
+            <li>过期药品单独标记，提示按社区方式回收</li>
+            <li>清单可导出，交给家人或家庭医生</li>
+          </ul>
+        </div>
+        <div class="fig">
+          <div class="mk">
+            <div class="mk-h"><b>库存预警</b><span>3 项待处理</span></div>
+            <div class="wrow"><span class="bd b"></span><span class="nm">布洛芬缓释胶囊</span><span class="vl">已过期</span></div>
+            <div class="wrow"><span class="bd w"></span><span class="nm">氨氯地平 5mg</span><span class="vl">剩 6 片</span></div>
+            <div class="wrow"><span class="bd w"></span><span class="nm">碳酸钙 D3</span><span class="vl">剩 9 片</span></div>
+            <div class="wrow"><span class="bd" style="background:#CBD2C9"></span><span class="nm">维生素 D3</span><span class="vl">剩 28 粒</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 03 老人端 -->
+  <div class="lp-sec dark" id="lp-elder">
+    <div class="lp-wrap">
+      <div class="lp-elder">
+        <div>
+          <div class="kicker">03 — 适老化</div>
+          <h3>给父母的界面，<br>只需要两个大按钮。</h3>
+          <p>不切换页面、不点小人图标。打开就是“下一次吃药”，字号放大到不戴老花镜也看得清。</p>
+          <div class="elist">
+            <div>整屏只有一件事：现在该吃什么</div>
+            <div>一键重听儿女录音，方言也听得懂</div>
+            <div>“叫一下家人”直接拨通，不用找号码</div>
+          </div>
+        </div>
+        <div class="phone">
+          <div class="pt"><b>12:04</b><span>8 月 22 日 周四</span></div>
+          <div class="pd">下一次服药 · 26 分钟后</div>
+          <div class="pn">12:30</div>
+          <div class="pdrug">二甲双胍缓释片 0.5g ×1<br>＋ 维生素 D3 ×1 · 4 号格</div>
+          <div class="pbig" id="mockTaken">我已服药</div>
+          <div class="psub"><span id="mockRetry">重听提醒</span><span id="mockCall">叫一下家人</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 04 引言 -->
+  <div class="lp-sec">
+    <div class="lp-wrap">
+      <div class="lpq">
+        <p>“头两周我妈老嫌它吵，说不如我打电话。后来换成我妹录的那句「妈，该吃药了」，她就不吭声了，比我催管用。”</p>
+        <span>家属端用户 · 河南郑州 · 用了三个月</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 05 FAQ -->
+  <div class="lp-sec white" id="lp-faq">
+    <div class="lp-wrap">
+      <div class="lp-head">
+        <div class="kicker">05 — 常见问题</div>
+        <h2 class="lp-h2">装之前，先问清楚。</h2>
+      </div>
+      <div class="faqs">
+        <details class="faq" open>
+          <summary>家里老人不会用手机，能用吗？</summary>
+          <p>老人端只需要点一个按钮。药箱本身不依赖手机——到点自动播报，开盖自动核销，老人的手机可以只是放在旁边。</p>
+        </details>
+        <details class="faq">
+          <summary>八个格子够用吗？</summary>
+          <p>八格对应一天最多四次的用药安排，按周分装。药品种类多的家庭可以先在库存里登记，再决定哪些进格、哪些留在原盒。</p>
+        </details>
+        <details class="faq">
+          <summary>录音和服药记录谁能看到？</summary>
+          <p>只对家庭组成员可见，不采集位置、不做广告推送。家属看到的是服药记录与库存，看不到与用药无关的信息。</p>
+        </details>
+        <details class="faq">
+          <summary>药箱断电或者断网了怎么办？</summary>
+          <p>断网时按本地时间继续播报与记录，恢复后自动补传；断电后重新上电即恢复原计划，已完成的记录不会重复。</p>
+        </details>
+      </div>
+    </div>
+  </div>
+
+  <!-- 06 入口 -->
+  <div class="lp-sec">
+    <div class="lp-wrap">
+      <div class="lp-head">
+        <div class="kicker">06 — 开始使用</div>
+        <h2 class="lp-h2">从哪一端进去，都可以。</h2>
+        <p class="lp-sub2">子女管理分装与提醒，父母只需要按一下。电脑端、手机端、老人端共用同一个家庭组与同一份数据。</p>
+      </div>
+      <div class="entry-grid">
+        <div class="entry-card">
+          <span class="tag">子女端</span>
+          <h4>子女端控制台</h4>
+          <p>总览、服药计划、库存预警、提醒记录、告警中心、语音提醒、AI 助手、家庭成员，八屏协同。</p>
+          <div class="acts">
+            <button class="lp-btn pri" onclick="enterChild()">
+              登录进入
+              <svg class="ic" viewBox="0 0 24 24"><path d="M5 12h13M13 6l6 6-6 6"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="entry-card dark">
+          <span class="tag">老人端</span>
+          <h4>老人端</h4>
+          <p>大字号、两个大按钮、方言提醒。打开就是“下一次吃药”，不需要学新东西。</p>
+          <div class="acts">
+            <button class="lp-btn gho" onclick="enterElder()">进入老人端</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="lp-foot">
+    <div class="lp-wrap">
+      <span>安心格 AnCareBox · 家庭用药安全</span>
+      <span>传智杯参赛作品 · 页面数据均为示例值</span>
+    </div>
+  </footer>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="/js/api.js?v=20261106b"></script>
+<script>
+/* ===== 页面流转：介绍页作为独立入口，登录/老人端都另起标签页 ===== */
+function enterChild() {
+  // 手机上直接进移动端，桌面另起一个标签页打开登录页
+  if (isPhone()) return go('/m/login.html');
+  window.open('/login.html?from=/index.html', '_blank');
+}
+function enterElder() {
+  if (isPhone()) return go('/m/elder.html');
+  window.open('/elder.html', '_blank');
+}
+
+/* ===== 移动端（public/m/）===== */
+function isPhone() {
+  return window.matchMedia('(max-width: 760px)').matches ||
+    /Android|iPhone|iPod|iPad|Mobile|HarmonyOS/i.test(navigator.userAgent);
+}
+/** 手机上直接跳转（移动端另开标签会让介绍页留在后台），桌面上另起标签 */
+function go(url) {
+  if (isPhone()) location.href = url;
+  else window.open(url, '_blank');
+}
+function enterMobile() {
+  go('/m/login.html');
+}
+
+/* ===== 介绍页 · 机器女声试听 + 老人端模型按钮反馈 ===== */
+(function(){
+  const btn=document.getElementById('voicePlay');
+  const card=document.getElementById('voiceCard');
+  const note=document.getElementById('voiceNote');
+  const TEXT='妈，吃完午饭记得吃四号格的药。';
+  const IDLE='机器合成女声 · 点击右侧按钮试听';
+  const synth=window.speechSynthesis;
+  let speaking=false;
+  function stopSpeak(){
+    speaking=false;
+    if(card)card.classList.remove('playing');
+    if(note)note.textContent=IDLE;
+    if(synth&&synth.cancel){try{synth.cancel()}catch(e){}}
+  }
+  function pickVoice(){
+    if(!synth||!synth.getVoices)return null;
+    const list=synth.getVoices()||[];
+    const zh=list.filter(v=>/zh|cmn|chinese/i.test(v.lang+' '+v.name));
+    if(!zh.length)return null;
+    return zh.find(v=>/female|xiaoxiao|xiaoyi|xiaohan|xiaomo|huihui|yaoyao|tingting|mei-?jia|li-?mu|sinji|女/i.test(v.name))||zh[0];
+  }
+  function speak(){
+    if(!synth||!window.SpeechSynthesisUtterance){
+      if(typeof toast==='function')toast('当前浏览器不支持语音合成，换 Chrome 或 Edge 试试');
+      return;
+    }
+    if(speaking){stopSpeak();return;}
+    try{synth.cancel()}catch(e){}
+    const u=new SpeechSynthesisUtterance(TEXT);
+    const v=pickVoice();
+    if(v)u.voice=v;
+    u.lang='zh-CN';u.rate=0.95;u.pitch=1.25;u.volume=1;
+    u.onstart=function(){
+      speaking=true;
+      if(card){card.classList.add('playing');if(note)note.textContent='正在播放 · 机器合成女声';}
+    };
+    u.onend=stopSpeak;
+    u.onerror=function(){
+      stopSpeak();
+      if(typeof toast==='function')toast('这台设备没有可用的中文语音，试听暂不可用');
+    };
+    synth.speak(u);
+    setTimeout(function(){
+      if(!speaking&&synth.speaking){
+        speaking=true;
+        if(card){card.classList.add('playing');if(note)note.textContent='正在播放 · 机器合成女声';}
+      }
+    },260);
+  }
+  if(btn)btn.addEventListener('click',speak);
+  const retry=document.getElementById('mockRetry');
+  if(retry)retry.addEventListener('click',speak);
+  const taken=document.getElementById('mockTaken');
+  if(taken)taken.addEventListener('click',function(){
+    if(taken.classList.contains('done'))return;
+    const old=taken.textContent;
+    taken.classList.add('done');taken.textContent='已记录 · 12:04';
+    setTimeout(function(){taken.classList.remove('done');taken.textContent=old;},1800);
+  });
+  const call=document.getElementById('mockCall');
+  if(call)call.addEventListener('click',function(){
+    if(typeof toast==='function')toast('正在呼叫家属 · 演示按钮');
+  });
+  window.addEventListener('beforeunload',stopSpeak);
+})();
+</script>
+</body>
+</html>
