@@ -145,7 +145,7 @@ Content-Type: application/json
 | `sources[].type` | string | `rule`（规则库）/ `insight`（关联建议）/ `llm`（大模型） |
 | `sources[].label` | string | 来源名称，展示给用户 |
 
-> 注意：回答末尾会**自动附带近期最相关的一条建议**作为上下文（体现"主动接管 + 你问的"双向结合），UI 无需特殊处理。
+> 注意：回答末尾会**自动附带近期最相关的一条建议**作为上下文（体现「主动接管」与「按需问答」的双向结合），UI 无需特殊处理。
 
 ---
 
@@ -165,7 +165,7 @@ Content-Type: application/json
 
 - ✅ `GET /api/assistant/insights` — 规则引擎已实现，覆盖：漏服、重复服药、低库存、依从性下滑、无异常正面反馈
 - ✅ `POST /api/assistant/ask` — 规则关键词匹配已实现，附来源
-- ⏳ **待接入真实大模型**：当前 `generateAnswer()` 是规则占位；接入 LLM 时只替换该函数，接口契约不变
+- ✅ 大模型已接入：`generateAnswer()` 在配置 `LLM_API_KEY` 后调用模型；未配置或调用失败时回退规则引擎，接口契约不变
 
 ### 后端文件位置
 

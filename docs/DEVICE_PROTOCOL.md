@@ -619,7 +619,7 @@ POST /api/device/heartbeat
   "config_version": "a2f840e1bc2a",
   "config_changed": false,
   "next_task": { "...下一顿任务，结构同第 4 节..." },
-  "pending_commands": [ "...顺带把待执行指令给你，省一次请求..." ],
+  "pending_commands": [ "...待执行指令随本次响应一并下发，省一次请求..." ],
   "unread_alerts": 0
 }
 ```

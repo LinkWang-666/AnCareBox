@@ -175,7 +175,7 @@ copy .env.example .env        # Windows；Linux / macOS 用 cp .env.example .env
 
 | 变量 | 必填 | 填什么 |
 |---|---|---|
-| `DB_PASSWORD` | 是 | 你本机 MySQL 的 root 密码 |
+| `DB_PASSWORD` | 是 | 部署环境 MySQL 的 root 密码 |
 | `DB_NAME` | 是 | 默认 `smart_medbox`，不建库也行，`init-db` 会自动创建 |
 | `JWT_SECRET` | 是 | 任意随机长字符串。生成方式：`node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"` |
 | `LLM_API_KEY` | 否 | 留空则 AI 功能走规则引擎，所有接口行为不变 |
@@ -201,12 +201,12 @@ npm start
 > `npm run init-db` 是**全量重置**：会清空所有表并重新灌入（每次绑定码也会刷新）。  
 > 只想给现有库补测试数据、不动账号配置时，单独跑 `npm run seed-demo` 即可。
 
-> **旧库升级（增量迁移）**：如果你是在「效期预警 / 拍照识药」等功能上线**之前**就建好的库，`alert` 表的 `alert_type` 枚举里缺 `expiry`，会导致效期告警无法落进告警中心（终端会刷 `[assistant] 效期告警落库失败`）。不用全量重置，跑一次增量脚本即可（幂等，已含 `expiry` 时会自动跳过）：
+> **旧库升级（增量迁移）**：若数据库建立于「效期预警 / 拍照识药」等功能上线**之前**，`alert` 表的 `alert_type` 枚举里缺 `expiry`，会导致效期告警无法落进告警中心（终端会刷 `[assistant] 效期告警落库失败`）。不用全量重置，跑一次增量脚本即可（幂等，已含 `expiry` 时会自动跳过）：
 >
 > ```powershell
-> # PowerShell（项目根目录下，替换成你的密码；用户名/库名默认 root / smart_medbox）
+> # PowerShell（在项目根目录执行，密码替换为实际值；用户名/库名默认 root / smart_medbox）
 > Get-Content sql\11_expiry_alert.sql -Raw -Encoding UTF8 | `
->   mysql -h 127.0.0.1 -u root -p你的密码 --default-character-set=utf8mb4 smart_medbox
+>   mysql -h 127.0.0.1 -u root -p实际密码 --default-character-set=utf8mb4 smart_medbox
 > ```
 >
 > cmd 下等价写法：`mysql -u root -p smart_medbox < sql\11_expiry_alert.sql`
@@ -675,11 +675,11 @@ node scripts/probe-firstscreen.js
 | 登录后仍报红                        | 浏览器里存着旧令牌         | 退出重新登录一次                                          |
 | 刚清了浏览器数据，老人端要重绑               | Cookie 被一起清了      | 见下方「清理浏览器数据之后」                                    |
 | 改完代码刷新没变化                     | 浏览器缓存了旧版 JS       | 按 `Ctrl + F5` 强制刷新                                |
-| 启动时不停要你输 Y                    | 端口被无权结束的进程占着      | 见下方说明                                             |
+| 启动时反复提示输入 Y                    | 端口被无权结束的进程占着      | 见下方说明                                             |
 
 ### 关于「我已吃药提示 device_code 必填」
 
-这句英文很容易让人以为程序坏了，其实它说的是：**你现在的身份不是药箱。**
+这句英文很容易让人以为程序坏了，其实它说的是：**当前请求使用的身份不是药箱。**
 
 `POST /api/events` 有两种调用方式：
 
@@ -722,7 +722,7 @@ node scripts/probe-firstscreen.js
 - 占用者是**本项目自己的服务** → 直接沿用并打开浏览器，**不再要求输入 Y**；
 - 占用者是**别的程序**且 `taskkill` 失败 → 明确给出三种处理方案后退出，**绝不循环**。
 
-### 跑完自检要记得看一眼
+### 自检脚本的副作用与自动恢复
 
 `npm run test:auth` 是有副作用的：它会为了验证「解绑后令牌立即失效」  
 而真的解绑 MB-2026-0001，还会注册临时测试家庭。
