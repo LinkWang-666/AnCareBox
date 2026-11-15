@@ -88,7 +88,7 @@ async function main() {
   let r = await call('POST', '/api/auth/login', { username: USER_NAME, password: USER_PASS }, false);
   if (!r.ok) {
     bad('子女端登录', r.data && r.data.error);
-    console.log('\n请确认服务已启动、演示账号密码正确（见 DEMO_ACCOUNTS.md）');
+    console.log('\n请确认服务已启动、演示账号密码正确（见 README.md 3.4 节）');
     process.exit(1);
   }
   const userToken = r.data.accessToken;

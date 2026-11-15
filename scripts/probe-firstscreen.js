@@ -8,7 +8,7 @@
  *   它就会 toast 一条红字。所以「报红」不等于程序崩溃，而是「某个接口报错了」。
  *   手工点页面看不到是哪个接口，这个脚本把首屏链路全打一遍，报错就现形。
  *
- * 为什么绑定码要从 DEMO_ACCOUNTS.md 里读：
+ * 为什么绑定码要从 README.md 里读：
  *   绑定码每次跑 seed-auth / init-db 都会重新签发（每个药箱只有一个有效码），
  *   写死在脚本里第二天就过期了，反而误导人。
  *
@@ -48,9 +48,9 @@ async function call(method, urlPath, body) {
   return { status: res.status, data };
 }
 
-/** 从 DEMO_ACCOUNTS.md 的表格里抓出当前有效的绑定码 */
+/** 从 README.md（3.4 节）的表格里抓出当前有效的绑定码 */
 function readBindCodes() {
-  const file = path.join(__dirname, '..', 'DEMO_ACCOUNTS.md');
+  const file = path.join(__dirname, '..', 'README.md');
   if (!fs.existsSync(file)) return [];
   const md = fs.readFileSync(file, 'utf8');
   const out = [];
@@ -95,7 +95,7 @@ function readBindCodes() {
 
   const codes = readBindCodes();
   if (!codes.length) {
-    console.log('  [WARN] DEMO_ACCOUNTS.md 里没读到绑定码，跳过（跑一下 npm run seed-auth 会重新生成）');
+    console.log('  [WARN] README.md 里没读到绑定码，跳过（跑一下 npm run seed-auth 会重新生成）');
   }
 
   for (const { box, code } of codes) {

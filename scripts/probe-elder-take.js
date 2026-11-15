@@ -23,7 +23,7 @@ async function call(method, p, body, token) {
 }
 
 (async () => {
-  const md = fs.readFileSync(path.join(__dirname, '..', 'DEMO_ACCOUNTS.md'), 'utf8');
+  const md = fs.readFileSync(path.join(__dirname, '..', 'README.md'), 'utf8');
   const codes = [];
   const re = /\|\s*(MB-[\w-]+)\s*\|\s*(\d{6})\s*\|/g;
   let m;

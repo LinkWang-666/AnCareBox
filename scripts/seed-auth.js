@@ -3,7 +3,8 @@
  *
  * 为什么单独写脚本而不是写死在 SQL 里：
  *   密码必须存 bcrypt 哈希，而哈希每次生成都不同（盐随机），无法硬编码。
- *   所以账号在这里运行时生成，并把账号密码自动写成 DEMO_ACCOUNTS.md，避免手抄出错。
+ *   所以账号在这里运行时生成，并把账号密码自动写进 README.md 的「3.4 访问入口与演示账号」，
+ *   避免手抄出错（写入位置由 DEMO_ACCOUNTS 标记界定）。
  *
  * 运行：npm run seed-auth   （npm run init-db 会自动调用）
  */
@@ -94,16 +95,9 @@ async function run() {
     console.log(`  药箱  ${b.device_code}  绑定码 ${code}`);
   }
 
-  // 把账号密码写成文档，省得手抄
+  // 把账号密码写进 README 的演示账号表格，省得手抄
   const lines = [];
-  lines.push('# 演示账号');
-  lines.push('');
-  lines.push('> 本文件由 `scripts/seed-auth.js` 自动生成，每次执行 `npm run init-db` 都会刷新绑定码。');
-  lines.push('> **注意：含演示凭据，请勿提交到公开仓库。**');
-  lines.push('');
-  lines.push('## 子女端登录');
-  lines.push('');
-  lines.push('登录页：<http://localhost:3000/login.html>');
+  lines.push('**子女端登录**（<http://localhost:3000/login.html>）');
   lines.push('');
   lines.push('| 账号 | 密码 | 家庭 | 姓名 | 角色 | 说明 |');
   lines.push('|---|---|---|---|---|---|');
@@ -121,9 +115,7 @@ async function run() {
     lines.push(`| ${a.username} | ${DEMO_PASSWORD} | ${a.family} | ${a.real_name || '-'} | ${roleTxt} | ${note} |`);
   }
   lines.push('');
-  lines.push('## 药箱 / 老人端绑定码');
-  lines.push('');
-  lines.push('老人端：<http://localhost:3000/elder.html> —— 首次打开输入绑定码，之后自动记住。');
+  lines.push('**药箱绑定码**（老人端 <http://localhost:3000/elder.html>，首次打开输入即可，之后自动记住）');
   lines.push('');
   lines.push('| 药箱编号 | 绑定码 | 有效期 |');
   lines.push('|---|---|---|');
@@ -131,20 +123,38 @@ async function run() {
     lines.push(`| ${c.device_code} | ${c.code} | 7 天（演示放宽，生产应为 5 分钟） |`);
   }
   lines.push('');
-  lines.push('> **绑定码以最新生成的为准**：在子女端控制台「隔间管理 → 生成绑定码」现场生成新码后，');
-  lines.push('> 上表中的旧码立即作废（每个药箱同时只有一个有效码）。老人端输码报红字提示时，重新生成一个即可。');
+  lines.push('**越权自测**：用 `li_owner` 登录后，控制台老人列表只能看到李奶奶、看不到王大爷，即家庭隔离生效。');
   lines.push('');
-  lines.push('## 越权自测');
-  lines.push('');
-  lines.push('用 `li_owner` 登录后，在控制台看老人列表 —— 只能看到李奶奶，看不到王大爷，即为隔离生效。');
+  lines.push('> 上表的绑定码以**最新一次** `npm run init-db` / `npm run seed-auth` 生成的为准；');
+  lines.push('> 在子女端「隔间管理 → 生成绑定码」现场生成新码后，表中旧码立即作废。');
   lines.push('');
 
-  const outPath = path.join(__dirname, '..', 'DEMO_ACCOUNTS.md');
-  fs.writeFileSync(outPath, lines.join('\n'), 'utf8');
+  const ok = writeIntoReadme(lines.join('\n').replace(/\n+$/, ''));
 
   console.log('--------------------------------------------------');
-  console.log(`  账号密码已写入：DEMO_ACCOUNTS.md`);
+  console.log(ok ? '  账号密码已写入：README.md（3.4 访问入口与演示账号）'
+                : '  [WARN] README.md 中未找到 DEMO_ACCOUNTS 标记，账号密码未写入文档');
   console.log('--------------------------------------------------');
+}
+
+/**
+ * 把生成的表格写进 README 的标记区间
+ *   为什么不再单独存一个 md：账号只该有一个可信来源，
+ *   散成两份就会出现「README 说密码 A、旧文件说密码 B」的尴尬。
+ */
+function writeIntoReadme(section) {
+  const readmePath = path.join(__dirname, '..', 'README.md');
+  if (!fs.existsSync(readmePath)) return false;
+  const md = fs.readFileSync(readmePath, 'utf8');
+  const BEGIN = '<!-- DEMO_ACCOUNTS:BEGIN';
+  const END = '<!-- DEMO_ACCOUNTS:END -->';
+  const i = md.indexOf(BEGIN);
+  const j = md.indexOf(END);
+  if (i < 0 || j < 0 || j < i) return false;
+  const headEnd = md.indexOf('\n', i);          // BEGIN 注释所在行的行尾
+  const out = md.slice(0, headEnd + 1) + section + '\n' + md.slice(j);
+  fs.writeFileSync(readmePath, out, 'utf8');
+  return true;
 }
 
 if (require.main === module) {

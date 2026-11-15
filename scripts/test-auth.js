@@ -236,7 +236,7 @@ const login = (u, p) => req('POST', '/auth/login', { username: u, password: p })
       `"${process.execPath}" "${require('path').join(__dirname, 'seed-auth.js')}"`,
       { stdio: 'inherit' }
     );
-    console.log('\n演示环境已恢复 —— DEMO_ACCOUNTS.md 里的绑定码是最新可用的。');
+    console.log('\n演示环境已恢复 —— README.md 3.4 节表格里的绑定码是最新可用的。');
   } catch (e) {
     console.log('\n[WARN] 自动恢复失败，请手动执行：node scripts/seed-auth.js');
   }

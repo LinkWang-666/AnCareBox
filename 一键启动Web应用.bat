@@ -112,7 +112,7 @@ echo.
 echo --------------------------------------------------
 echo   启动成功！这个黑色窗口不能关，关掉 = 停止服务。
 echo   服务地址：http://localhost:3000
-echo   演示账号见 DEMO_ACCOUNTS.md
+echo   演示账号见 README.md 的 3.4 节
 echo   确认服务是否还活着：http://localhost:3000/api/health
 echo --------------------------------------------------
 echo.

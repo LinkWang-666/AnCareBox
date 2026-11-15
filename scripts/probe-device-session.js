@@ -12,7 +12,7 @@ const fs = require('fs');
 const path = require('path');
 
 const BASE = process.env.BASE || 'http://127.0.0.1:3000';
-const DEMO = path.join(__dirname, '..', 'DEMO_ACCOUNTS.md');
+const DEMO = path.join(__dirname, '..', 'README.md');
 
 let pass = 0, fail = 0;
 function ok(name, cond, extra) {
@@ -73,7 +73,7 @@ async function call(method, apiPath, body, token, withCookie) {
   const md = fs.readFileSync(DEMO, 'utf8');
   const m = md.match(/\|\s*(MB-2026-\d+)\s*\|\s*(\d{6})\s*\|/);
   if (m) code = m[2];
-  if (!code) { console.log('  读不到绑定码，请检查 DEMO_ACCOUNTS.md'); return; }
+  if (!code) { console.log('  读不到绑定码，请检查 README.md 的 3.4 节'); return; }
   const boxCode = m[1];
   console.log(`  药箱 ${boxCode}，绑定码 ${code}\n`);
 

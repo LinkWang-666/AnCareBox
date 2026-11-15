@@ -776,6 +776,6 @@ npm run migrate:device
 ## 20. 相关文档
 
 - [ASSISTANT_API.md](ASSISTANT_API.md) —— AI 用药助手接口
-- [SECURITY.md](../SECURITY.md) —— 鉴权与越权防护设计
+- [README.md](../README.md) —— 项目介绍、技术架构、安装运行与演示账号（2.6 鉴权与权限边界、3.4 演示账号）
 - `scripts/device-agent.js` —— 本协议的参考实现（设备替身）
 - `scripts/device-sim.js` —— 早期的事件流模拟器（只发事件，不跑完整生命周期）

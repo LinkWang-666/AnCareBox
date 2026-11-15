@@ -30,12 +30,12 @@ echo --------------------------------------------------
 echo   老人端已在浏览器新标签页打开。
 echo.
 echo   【首次打开】要输入 6 位绑定码（老人不需要密码）：
-echo      打开 DEMO_ACCOUNTS.md 查看当前最新绑定码
+echo      打开 README.md 的 3.4 节查看当前最新绑定码
 echo      或在子女端「隔间管理 → 生成绑定码」现场生成
 echo.
 echo   【输码后底部弹红字】绑定码过期了，不是坏了。
 echo      绑定码每跑一次 npm run init-db 都会重新签发，
-echo      必须用 DEMO_ACCOUNTS.md 里最新的那个。
+echo      必须用 README.md 3.4 节里最新的那个。
 echo.
 echo   【手机演示】手机连同一个 WiFi，浏览器访问：
 echo      http://%LANIP%:3000/elder.html

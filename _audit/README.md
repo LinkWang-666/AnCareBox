@@ -40,5 +40,5 @@ node _audit/fe.js
 ## 说明
 
 脚本里出现的测试账号（owner / member / 李家 / 王家）都是种子数据里自带的演示账号，
-密码从 `.env` 或 `DEMO_ACCOUNTS.md` 读取，不硬编码在脚本中。
+密码从 `.env` 或 `README.md` 的演示账号表格读取，不硬编码在脚本中。
 `probe2.js` / `probe3.js` 会创建临时计划、临时只读账号，跑完自动清理。
