@@ -12,6 +12,9 @@
     "device": "node scripts/device-agent.js",
     "clean:agent": "node scripts/clean-agent-data.js",
     "migrate:device": "node scripts/migrate-device.js",
+    "lan-ip": "node scripts/print-lan-ip.js",
+    "test": "node _audit/smoke.js && node _audit/probe2.js && node _audit/probe3.js && node _audit/consistency.js",
+    "test:fe": "node _audit/fe.js",
     "test:auth": "node scripts/test-auth.js"
   },
   "dependencies": {
