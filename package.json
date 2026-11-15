@@ -1,0 +1,28 @@
+{
+  "name": "smart-medbox",
+  "version": "1.0.0",
+  "description": "智能药箱 · 家庭用药协同系统（AI Web 应用竞赛作品）",
+  "main": "server/app.js",
+  "scripts": {
+    "start": "node server/app.js",
+    "init-db": "node scripts/init-db.js",
+    "seed-auth": "node scripts/seed-auth.js",
+    "seed-demo": "node scripts/seed-demo.js",
+    "sim": "node scripts/device-sim.js",
+    "device": "node scripts/device-agent.js",
+    "clean:agent": "node scripts/clean-agent-data.js",
+    "migrate:device": "node scripts/migrate-device.js",
+    "test:auth": "node scripts/test-auth.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-rate-limit": "^8.7.1",
+    "helmet": "^8.3.0",
+    "jsonwebtoken": "^9.0.3",
+    "mysql2": "^3.11.0"
+  }
+}

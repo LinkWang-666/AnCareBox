@@ -1,0 +1,60 @@
+# ============================================================
+# 安心格 · 智能药箱 —— Git 忽略规则
+#
+# 原则：凡是「本机特有的」和「含真实凭据的」，一律不进仓库。
+# 仓库是公开的，一旦提交就永久留在历史里，删掉也还在。
+# ============================================================
+
+# ---------- 1. 真实环境配置（含数据库密码、JWT 密钥、大模型 Key）----------
+# 这一条是整份文件里最重要的。仓库只放 .env.example 模板。
+.env
+.env.local
+.env.*.local
+*.env
+!.env.example
+
+# ---------- 2. 依赖目录（体积大，npm install 可还原）----------
+node_modules/
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ---------- 3. 用户上传的音频（方言录音为老人真实声音，属个人隐私）----------
+public/audio/*
+!public/audio/.gitkeep
+
+# ---------- 4. 运行时日志与临时文件 ----------
+logs/
+*.log
+_bench*.js
+_tmp*
+*.tmp
+*.bak
+*.swp
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---------- 5. 自检脚本产生的截图（体积大且无长期价值）----------
+_audit/*.png
+_audit/*.jpg
+_audit/tmp_*
+shot_*.png
+
+# ---------- 6. 数据库导出（可能含真实家庭数据）----------
+*.sql.gz
+dump*.sql
+backup*.sql
+*.dump
+
+# ---------- 7. 编辑器与 IDE ----------
+.vscode/
+.idea/
+*.sublime-*
+*.code-workspace
+
+# ---------- 8. 部署产物 ----------
+dist/
+build/
+*.zip
+*.tar.gz
