@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <!-- 适老化要点：禁止用户缩放会阻碍老人放大，这里允许缩放 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>安心格 · 老人端</title>
+  <link rel="stylesheet" href="/css/style.css?v=20261106e">
+  <style>
+    /* ---------- 绑定页（保持适老化大字） ---------- */
+    .ebind-input{
+      width:100%; padding:20px; margin:16px 0 24px;
+      font-size:48px; text-align:center; letter-spacing:14px;
+      border:3px solid #3E6851; border-radius:16px; font-family:inherit;
+      background:#fff; color:#000; outline:none;
+    }
+    .ebind-input:focus{ border-color:#3E6851; box-shadow:0 0 0 5px rgba(62,104,81,.15); }
+    .bind-tips{
+      font-size:24px; color:#55524c; background:#fff; border:1px solid #e8e2d6;
+      border-radius:16px; padding:20px; line-height:1.7; text-align:center;
+    }
+    .bind-hero{ text-align:center; margin:20px 0 8px; }
+    .bind-ico{ font-size:72px; line-height:1; margin-bottom:12px; }
+
+    /* ---------- 共用模式：使用者切换 ---------- */
+    .who-bar{ display:flex; gap:16px; justify-content:center; align-items:center;
+      padding:14px 24px 0; flex-wrap:wrap; }
+    .who-label{ font-size:26px; color:#55524c; font-weight:700; }
+    .who-btn{
+      font-size:30px; font-weight:700; padding:14px 40px; border-radius:44px;
+      border:3px solid #3E6851; background:#fff; color:#3E6851;
+      cursor:pointer; font-family:inherit; transition:all .2s;
+    }
+    .who-btn.on{ background:#3E6851; color:#fff; box-shadow:0 4px 14px rgba(62,104,81,.3); }
+  </style>
+</head>
+<body class="elder">
+
+<!-- 未绑定时显示：只需输入 6 位数字，不需要账号密码 -->
+<div class="bind-wrap" id="bindWrap" style="display:none">
+  <div class="bind-hero">
+    <div class="bind-ico">&#128230;</div>
+    <div class="bind-tips" style="border:none;background:none">请把子女手机上的 6 位绑定码，输入到下面</div>
+  </div>
+  <input id="bindCode" class="ebind-input" maxlength="6" inputmode="numeric" placeholder="&#183;&#183;&#183;&#183;&#183;&#183;">
+  <button class="sos-card" id="btnBind" style="animation:none;background:linear-gradient(180deg,#3E6851,#2F5446)">
+    <span class="big">&#10003; 绑定这台药箱</span>
+  </button>
+  <div class="bind-tips">
+    绑定码由子女在手机上点「生成绑定码」获得，5 分钟内有效。<br>
+    只需绑定一次，以后打开就能直接用了。
+  </div>
+</div>
+
+<!-- 顶部问候 + 大时钟（对照设计稿第 3 页） -->
+<div class="ehead" id="mainHead" style="display:none">
+  <div class="hi" id="greetLine">您好</div>
+  <div style="text-align:right">
+    <div class="clock" id="clock">--:--</div>
+    <div class="date" id="dateLine"></div>
+  </div>
+</div>
+
+<!-- 共用模式：选择现在是谁在用药（后端返回 elders 时才显示） -->
+<div class="who-bar" id="whoBar" style="display:none"></div>
+
+<div class="ewrap" id="mainWrap" style="display:none">
+
+  <!-- 左列：当前任务 -->
+  <div class="ecol">
+    <!-- 当前该吃什么：单页只显示这一个区块，避免老人选择困难 -->
+    <div id="nowBox" style="display:none"></div>
+
+    <!-- 这一顿已经确认吃完了，替换掉上面的待服药区块 -->
+    <div id="doneHint" class="edone" style="display:none">
+      &#10003; 这顿已经吃好了
+      <small>下次吃药的时间到了，会再提醒您。</small>
+    </div>
+  </div>
+
+  <!-- 右列：求救 + 今日打卡 -->
+  <div class="ecol">
+    <!-- SOS 大卡：任何时候都能按，按下就通知子女 -->
+    <button class="sos-card" id="btnSos">
+      <span class="ph">&#128222;</span>
+      <span class="big">我不舒服</span>
+      <span class="hint">按下就通知子女</span>
+    </button>
+
+    <!-- 今日打卡：用圆点而不用数字，老人一眼看懂 -->
+    <div class="daycard">
+      <div class="t">今天吃了几次</div>
+      <div class="daydots" id="dayDots"></div>
+    </div>
+
+    <div class="bind-tips" style="font-size:22px">
+      <b>操作说明</b><br>
+      1. 药箱亮起某一格、听到提醒时，打开亮着的那一格。<br>
+      2. 把格子里的药全部取出，用温水送服。<br>
+      3. 吃完后按「我吃好了」按钮，就不会再提醒了。<br>
+      4. 身体不舒服，随时按红色「我不舒服」按钮。
+    </div>
+  </div>
+
+  <audio id="player" style="display:none"></audio>
+</div>
+
+<script src="/js/api.js?v=20261106b"></script>
+<script src="/js/elder.js?v=20261024c"></script>
+</body>
+</html>

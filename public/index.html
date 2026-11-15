@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>安心格 · 子女端</title>
+<link rel="stylesheet" href="/css/style.css?v=20261112b">
+</head>
+<body>
+
+<!-- ============ 顶栏 ============ -->
+<header class="appbar" id="appbar">
+  <div class="left">
+    <div class="brandline">
+      <span class="mark">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke-linejoin="round"><path d="M2.9 11.1 12 6l9.1 5.1-9.1 5.1Z" fill="#E4EFE8" stroke="#3E6851" stroke-width="1.25"/><path d="M2.9 11.1 12 16.2v4.5L2.9 15.6Z" fill="#4F7D66" stroke="#3E6851" stroke-width="1.25"/><path d="M21.1 11.1 12 16.2v4.5l9.1-5.1Z" fill="#4F7D66" stroke="#3E6851" stroke-width="1.25"/><rect x="8.6" y="9.9" width="4.6" height="2.2" rx="1.1" transform="rotate(-28 8.6 9.9)" fill="#fff" stroke="#8FB4A6" stroke-width=".7"/></svg>
+      </span>
+      安心格
+    </div>
+    <nav id="nav">
+      <button data-page="overview" class="on">总览</button>
+      <button data-page="plan">服药计划</button>
+      <button data-page="inventory">药箱库存</button>
+      <button data-page="remind">提醒记录</button>
+      <button data-page="alert">告警中心</button>
+      <button data-page="voice">语音提醒</button>
+      <button data-page="assistant">AI 助手</button>
+      <button data-page="family">家庭成员</button>
+    </nav>
+  </div>
+  <div class="right">
+    <button class="txtlink" id="toElder" style="height:auto">打开老人端</button>
+    <div class="bellwrap">
+      <div class="bell" id="bellBtn" title="通知" style="cursor:pointer">
+        <svg class="ic" viewBox="0 0 24 24"><path d="M18 9a6 6 0 1 0-12 0c0 5-2 6-2 6h16s-2-1-2-6"/><path d="M10.3 19a2 2 0 0 0 3.4 0"/></svg><i id="bellDot"></i>
+      </div>
+      <div class="notif" id="notifPanel"></div>
+    </div>
+    <div class="avatar" id="myAvatar">我</div>
+    <button class="btn btn-ghost" id="btnLogout" style="height:32px;padding:0 12px;font-size:12px">退出</button>
+  </div>
+</header>
+
+<!-- ============ 总览 ============ -->
+<section class="view active" id="view-overview">
+  <main>
+    <div class="pagehead">
+      <div><div class="kicker">每日一屏 · 一次看全</div><h2>用药总览</h2><p id="ovSub">加载中…</p></div>
+      <div class="acts"><a class="txtlink" onclick="go('alert')">待处理告警</a><a class="txtlink" onclick="go('plan')">管理分装</a></div>
+    </div>
+    <div class="card next-dose" id="nextDose" style="margin-bottom:18px"></div>
+    <div class="statstrip" id="ovStats">
+      <div class="cell"><div class="v" id="ovDone">—</div><div class="k">今日完成</div></div>
+      <div class="cell"><div class="v" id="ovStreak">—</div><div class="k">连续按时</div></div>
+      <div class="cell warn-c"><div class="v" id="ovUnread">—</div><div class="k">待处理告警</div></div>
+      <div class="cell"><div class="v" id="ovRate">—</div><div class="k">近 7 日依从率</div></div>
+    </div>
+    <div class="bento">
+      <div class="colL">
+        <div class="card">
+          <div class="chead"><div><h3>今日用药</h3><div class="sub" id="todaySub">加载中…</div></div></div>
+          <div class="slots" id="todaySlots"></div>
+        </div>
+        <div class="grid2">
+          <div class="card">
+            <div class="chead"><div><h3>按时服药率</h3><div class="sub" id="rateSub">近 7 日</div></div></div>
+            <div class="stat-row"><span class="big" id="rateBig">—</span><span class="delta" id="rateDelta"></span></div>
+            <div class="bar-chart" id="weekBars" style="height:150px"></div>
+            <div class="trend-legend" id="weekFoot"></div>
+          </div>
+          <div class="card">
+            <div class="chead"><div><h3>在库药品构成</h3><div class="sub" id="catSub">按功能分类</div></div></div>
+            <div class="donut-wrap" id="catDonut"></div>
+          </div>
+        </div>
+        <div class="card ai-card">
+          <div class="chead"><div><h3>AI 主动建议</h3><div class="sub">小助手一直在帮您留意</div></div></div>
+          <div id="aiCard"></div>
+          <div style="margin-top:12px"><a class="txtlink" onclick="go('assistant')">打开 AI 助手</a></div>
+        </div>
+      </div>
+      <div class="colR">
+        <div class="card alert-card">
+          <div class="chead"><div><h3>漏服与异常</h3><div class="sub" id="alertMiniSub">未处理提醒</div></div></div>
+          <div id="alertMini"></div>
+          <div style="margin-top:12px"><a class="txtlink" onclick="go('alert')">查看全部</a></div>
+        </div>
+        <div class="card">
+          <div class="chead"><div><h3>药箱隔间状态</h3><div class="sub">8 格 · 实时</div></div></div>
+          <div class="comp-grid" id="compGrid"></div>
+          <div style="margin-top:12px"><a class="txtlink" onclick="go('plan')">远程装药</a></div>
+        </div>
+        <div class="card">
+          <div class="chead"><div><h3>需要关注</h3><div class="sub" id="focusSub">库存与效期</div></div></div>
+          <div id="focusList"></div>
+          <div style="margin-top:12px"><a class="txtlink" onclick="go('inventory')">前往药箱库存</a></div>
+        </div>
+      </div>
+    </div>
+  </main>
+</section>
+
+<!-- ============ 服药计划与分装 ============ -->
+<section class="view" id="view-plan">
+  <main>
+    <div class="pagehead">
+      <div><div class="kicker">按时 · 按量 · 可追溯</div><h2>服药计划与分装</h2><p id="planSub">加载中…</p></div>
+      <div class="acts">
+        <select id="planElderSel" style="height:38px;border-radius:9px"></select>
+        <button class="btn btn-dark" id="btnNewSchedule">+ 新增服药计划</button>
+      </div>
+    </div>
+
+    <!-- 本周服药计划 -->
+    <div class="card" style="margin-bottom:18px">
+      <div class="chead"><div><h3>本周服药计划</h3><div class="sub" id="planWeekSub">加载中…</div></div></div>
+      <div id="scheduleTable"></div>
+    </div>
+
+    <div class="grid2">
+      <!-- 药盒分装（8 格） -->
+      <div class="card">
+        <div class="chead"><div><h3>药盒分装</h3><div class="sub">8 格 · 选择药箱</div></div></div>
+        <div class="form-row" style="margin-bottom:12px">
+          <div class="field"><label>药箱</label><select id="c_medbox" style="min-width:180px"></select></div>
+          <button id="btnBindCode">生成绑定码</button>
+        </div>
+        <div id="bindResult" style="display:none" class="card bind-result" style="margin-bottom:12px">
+          <div class="chead"><div><h3>新绑定码（5 分钟内有效）</h3></div></div>
+          <p class="bind-code" id="bindCodeText"></p>
+          <p class="hint">打开老人端 elder.html，把这 6 位数字念给老人输入即可。</p>
+        </div>
+        <div id="compTable"></div>
+        <!-- 共用设置 -->
+        <div style="margin-top:18px;padding-top:16px;border-top:1px solid var(--line)">
+          <div class="chead"><div><h3>共用设置</h3><div class="sub">一台安心格给多位老人用（如老两口合用）</div></div></div>
+          <div id="shareChks" class="share-chks"><span class="hint">加载中…</span></div>
+          <button id="btnSaveShare" class="btn btn-dark" style="margin-top:12px">保存共用设置</button>
+        </div>
+      </div>
+
+      <!-- 新增计划表单 -->
+      <div class="card">
+        <div class="chead"><div><h3 id="planFormTitle">新增服药计划</h3><div class="sub">一个时间点 = 一条计划 = 一个隔间</div></div></div>
+        <div class="form-row">
+          <div class="field"><label>老人 *</label><select id="s_elder"></select></div>
+          <div class="field"><label>服药时间 *</label><input id="s_time" type="time" value="08:00"></div>
+          <div class="field"><label>时段标签</label>
+            <select id="s_label"><option>早上</option><option>中午</option><option>晚上</option><option>睡前</option></select></div>
+        </div>
+        <div class="form-row">
+          <div class="field"><label>绑定隔间</label><select id="s_compartment"></select></div>
+          <div class="field"><label>可提前(分)</label><input id="s_before" type="number" value="10" style="min-width:80px"></div>
+          <div class="field"><label>可延后(分)</label><input id="s_after" type="number" value="30" style="min-width:80px"></div>
+        </div>
+        <div class="form-row" style="align-items:flex-end">
+          <div class="field"><label>本次要吃的药</label><select id="s_medicine"></select></div>
+          <div class="field"><label>剂量</label><input id="s_dose" type="number" step="0.5" value="1" style="min-width:70px"></div>
+          <div class="field" style="flex:1"><label>服用提示</label><input id="s_note" placeholder="餐后温水送服" style="width:100%"></div>
+          <button id="btnAddItem">加入明细</button>
+        </div>
+        <div id="itemsPreview" style="margin-bottom:12px"></div>
+        <button class="btn btn-dark btn-block" id="btnSaveSchedule">保存计划</button>
+      </div>
+    </div>
+  </main>
+</section>
+
+<!-- ============ 药箱库存与效期 ============ -->
+<section class="view" id="view-inventory">
+  <main>
+    <div class="pagehead">
+      <div><div class="kicker">库存 · 效期 · 安全</div><h2>药箱库存与效期</h2><p id="invSub">加载中…</p></div>
+      <div class="acts">
+        <a class="txtlink" id="onlyAbn">仅看异常</a>
+        <button class="btn btn-dark" id="addMedBtn">+ 添加药品</button>
+      </div>
+    </div>
+    <div class="statstrip" id="invStats">
+      <div class="cell"><div class="v" id="invCount">—</div><div class="k">在库药品（种）</div></div>
+      <div class="cell warn-c"><div class="v" id="invLow">—</div><div class="k">库存不足 · 需补货</div></div>
+      <div class="cell warn-c"><div class="v" id="invNearExp">—</div><div class="k">30 天内到期</div></div>
+      <div class="cell danger-c"><div class="v" id="invExpired">—</div><div class="k">已过期</div></div>
+    </div>
+    <div class="inv-layout">
+      <div style="display:flex;flex-direction:column;gap:18px;min-width:0">
+        <div class="card">
+          <div class="chead"><div><h3>在库药品明细</h3><div class="sub" id="invListSub">按剩余量升序</div></div></div>
+          <div id="invTable"></div>
+        </div>
+        <div class="card">
+          <div class="chead"><div><h3>效期时间线</h3><div class="sub">未来 90 天内到期或已过期的药品</div></div></div>
+          <div id="expTimeline"></div>
+        </div>
+      </div>
+      <div class="colR">
+        <div class="card">
+          <div class="chead"><div><h3>库存健康度</h3><div class="sub">按余量、效期、分装综合评分</div></div></div>
+          <div class="score"><span class="n" id="healthScore">—</span><span><small>综合评分</small></span></div>
+          <div class="tip" style="border:none;padding-bottom:4px"><b style="font-size:13px">补药清单</b></div>
+          <ul class="restock" id="restockList"></ul>
+          <button class="btn btn-ghost btn-block" id="restockBtn">生成购药清单</button>
+        </div>
+        <div class="card">
+          <div class="chead"><div><h3>过期处理</h3><div class="sub" id="expSub">待处理</div></div></div>
+          <div id="expList"></div>
+          <button class="btn btn-ghost btn-block" id="cleanBtn">标记已清理</button>
+        </div>
+      </div>
+    </div>
+  </main>
+</section>
+
+<!-- ============ 提醒记录 ============ -->
+<section class="view" id="view-remind">
+  <main>
+    <div class="pagehead">
+      <div><div class="kicker">每一次提醒 · 都有回音</div><h2>提醒记录</h2><p id="remindSub">加载中…</p></div>
+      <div class="acts"><button class="btn btn-dark" id="btnExportRecord">导出用药记录单</button></div>
+    </div>
+    <div class="statstrip" id="remindStats">
+      <div class="cell"><div class="v" id="rkToday">—</div><div class="k">今日计划</div></div>
+      <div class="cell"><div class="v" id="rkDone">—</div><div class="k">已按时</div></div>
+      <div class="cell warn-c"><div class="v" id="rkOverdue">—</div><div class="k">超时未取</div></div>
+      <div class="cell"><div class="v" id="rkRate">—</div><div class="k">近 7 日依从率</div></div>
+    </div>
+    <div class="bento">
+      <div class="colL">
+        <div class="card">
+          <div class="chead"><div><h3>今日提醒</h3><div class="sub" id="todayRemindSub">加载中…</div></div></div>
+          <div id="todayRemindList"></div>
+        </div>
+        <div class="card">
+          <div class="chead"><div><h3>服药记录</h3><div class="sub">流水查询</div></div></div>
+          <div class="ev-query">
+            <div class="field"><label>老人</label><select id="ev_elder"></select></div>
+            <div class="field"><label>日期</label><input id="ev_date" type="date"></div>
+            <button id="btnQueryEvents">查询</button>
+          </div>
+          <div id="eventTable"></div>
+        </div>
+      </div>
+      <div class="colR">
+        <div class="card">
+          <div class="chead"><div><h3>提醒策略</h3><div class="sub" id="policySub">选中老人后保存，药箱按此执行</div></div></div>
+          <div class="field"><label>选择老人</label><select id="p_elder"></select></div>
+
+          <div class="ps-group"><span class="ps-title">语音</span></div>
+          <div class="field"><label>音量 <em class="val" id="p_volume_val">3</em></label><input id="p_volume" type="range" min="1" max="5" step="1"></div>
+          <div class="frow2">
+            <div class="field"><label>语速</label><select id="p_rate"><option value="slow">慢</option><option value="normal">正常</option><option value="fast">快</option></select></div>
+            <div class="field"><label>重复次数</label><input id="p_repeat" type="number" min="1" max="5"></div>
+          </div>
+
+          <div class="ps-group"><span class="ps-title">判定</span></div>
+          <div class="frow2">
+            <div class="field"><label>超时判定(分)</label><input id="p_timeout" type="number"></div>
+            <div class="field"><label>重复窗口(分)</label><input id="p_dupwin" type="number"></div>
+          </div>
+
+          <div class="ps-group"><span class="ps-title">提前提醒</span></div>
+          <div class="sw-row">
+            <label class="sw"><input type="checkbox" id="p_30"><i></i><span>提前 30 分</span></label>
+            <label class="sw"><input type="checkbox" id="p_10"><i></i><span>提前 10 分</span></label>
+            <label class="sw"><input type="checkbox" id="p_3"><i></i><span>提前 3 分</span></label>
+          </div>
+
+          <button class="btn btn-dark" id="btnSavePolicy" style="width:100%;margin-top:16px">保存提醒策略</button>
+        </div>
+      </div>
+    </div>
+  </main>
+</section>
+
+<!-- ============ 告警中心 ============ -->
+<section class="view" id="view-alert">
+  <main>
+    <div class="pagehead">
+      <div><div class="kicker">异常 · 发现即处理</div><h2>告警中心</h2><p id="alSummary">加载中…</p></div>
+      <div class="acts"><button class="btn btn-ghost" id="ackAll">全部标为已处理</button></div>
+    </div>
+    <div class="al-wrap">
+      <div>
+        <div class="afilter" id="afilter"></div>
+        <div class="alist" id="alist"></div>
+      </div>
+      <aside class="judge">
+        <h3>二次研判怎么做</h3>
+        <p>规则命中只是候选，不是结论。每条候选告警都要过一遍模型复核，才决定推不推、推给谁。</p>
+        <div class="jstep"><span class="n">1</span><div><b>规则层先筛</b><p>20 类成分级相互作用规则库，覆盖降糖药联用、抗血小板/抗凝、他汀联用、硝酸酯 × PDE5 禁忌等，命中即生成候选。</p></div></div>
+        <div class="jstep"><span class="n">2</span><div><b>模型层再核</b><p>结合老人的慢病、过敏史、年龄与近期取药记录，判断这个组合在他身上到底有多危险。</p></div></div>
+        <div class="jstep"><span class="n">3</span><div><b>三档结论</b><p>明确危险立刻推送；需警惕可监测给观察项；规则误报则降噪不打扰。</p></div></div>
+        <div class="note">只做提醒、记录与科普，不诊断、不开处方、不替代药师。</div>
+      </aside>
+    </div>
+  </main>
+</section>
+
+<!-- ============ 语音提醒（方言录音） ============ -->
+<section class="view" id="view-voice">
+  <main>
+    <div class="pagehead">
+      <div><div class="kicker">你的声音 · 她的定心丸</div><h2>语音提醒</h2><p>用家人的声音提醒吃药 · 录好后自动同步到老人端「家人录音」</p></div>
+      <div class="acts"><a class="txtlink" id="seeElderTop">查看老人端效果</a></div>
+    </div>
+    <div class="inv-layout">
+      <div style="display:flex;flex-direction:column;gap:18px;min-width:0">
+        <div class="card">
+          <div class="chead"><div><h3>录制一段新提醒</h3><div class="sub">建议这样说：「妈，12 点半了，把 4 号格的药吃了」</div></div></div>
+          <div class="form-row">
+            <div class="field"><label>老人</label><select id="r_elder"></select></div>
+            <div class="field"><label>绑定时段</label><select id="r_schedule"></select></div>
+            <div class="field"><label>标题</label><input id="r_title" placeholder="早上吃药提醒"></div>
+            <div class="field"><label>方言</label><input id="r_dialect" placeholder="常州话"></div>
+          </div>
+          <div class="rec" id="recBox">
+            <div class="tm" id="recState" style="font-size:14px;font-family:inherit">未录音</div>
+            <button class="micbtn" id="btnRecord" title="开始录音">
+              <svg viewBox="0 0 24 24" style="width:28px;height:28px;stroke:#fff;fill:none;stroke-width:1.6"><rect x="9" y="2.5" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0"/><path d="M12 17.5v4M8.5 21.5h7"/></svg>
+            </button>
+            <p class="rechint">点一下开始录音，再点一下停止 · 需要浏览器麦克风权限</p>
+          <div class="recactions" id="recActions" style="display:none">
+            <button class="btn btn-ghost" id="btnStop">停止</button>
+            <button class="btn btn-dark" id="btnSaveRec">保存录音</button>
+            <button class="btn btn-ghost" id="btnDeleteRec" style="display:none;color:var(--bad);border-color:var(--bad)">删除</button>
+          </div>
+            <audio id="recPlay" controls style="display:none;width:100%;height:40px;margin-top:12px"></audio>
+          </div>
+        </div>
+        <div class="card">
+          <div class="chead"><div><h3>已保存的声音</h3><div class="sub" id="vlistSub">加载中…</div></div></div>
+          <div id="recTable"></div>
+        </div>
+      </div>
+      <div class="colR">
+        <div class="card">
+          <div class="chead"><div><h3>与老人端对应</h3><div class="sub">录好的声音会出现在老人屏幕上</div></div></div>
+          <p style="font-size:12.5px;line-height:1.75;color:var(--muted)">手机老人端（/m/elder.html）有「家人录音 · 点一下听」列表，老人可挑一段当场播放。到点提醒时，两端都优先播放子女录音，听不懂普通话的老人也能听懂。</p>
+          <p style="font-size:12.5px;line-height:1.75;color:var(--muted);margin-top:10px">左边每段右侧的「绑定时段」决定它在哪一顿响：绑了「早上 08:00」，这一顿就播它；选「通用」，只在这一顿没有专属录音时才轮到它。绑错了不用重录，直接改下拉就行。</p>
+          <button class="btn btn-ghost btn-block" id="seeElder">查看老人端</button>
+        </div>
+      </div>
+    </div>
+  </main>
+</section>
+
+<!-- ============ AI 用药助手 ============ -->
+<section class="view" id="view-assistant">
+  <main>
+    <div class="pagehead">
+      <div><div class="kicker">主动发现 · 主动建议</div><h2>AI 用药助手</h2><p>Agent 持续读取服药数据、库存与告警，主动发现问题；你也可以随时提问。</p></div>
+      <div class="acts"><button class="btn btn-ghost" id="btnRefreshInsights">&#8635; 刷新分析</button></div>
+    </div>
+    <div class="assistant-wrap">
+      <div class="ai-hero">
+        <div class="ai-avatar">&#129302;</div>
+        <div><h3>你好，我是你的用药助手</h3><p>我已自动分析家庭内所有老人的服药与库存数据，下面是发现的问题与建议。</p></div>
+        <span class="badge accent ai-tag">主动式 Agent</span>
+      </div>
+      <div class="ai-summary" id="aiSummary"></div>
+      <div class="card">
+        <div class="chead"><div><h3>主动建议</h3><div class="sub">助手自动分析 · 每 60 秒刷新</div></div></div>
+        <div class="insight-list" id="insightList"></div>
+      </div>
+      <div class="chatbox">
+        <div class="chat-head">&#128172; 用药问答（不诊断、不开处方，仅供参考）</div>
+        <div class="chat-log" id="chatLog"></div>
+        <div class="chat-input">
+          <textarea id="chatInput" placeholder="例如：阿司匹林和布洛芬能一起吃吗？" rows="1"></textarea>
+          <button class="btn btn-dark" id="btnAsk">发送</button>
+        </div>
+      </div>
+    </div>
+  </main>
+</section>
+
+<!-- ============ 家庭成员 ============ -->
+<section class="view" id="view-family">
+  <main>
+    <div class="pagehead">
+      <div><div class="kicker">一家人 · 共同守护</div><h2>家庭成员</h2><p id="famSub">加载中…</p></div>
+      <div class="acts"><button class="btn btn-dark" id="inviteBtn">+ 邀请成员</button></div>
+    </div>
+    <div class="card fam-box">
+      <div>
+        <div class="fb-title"><span class="dot"></span>老人档案</div>
+        <div class="fb-sub">听力与视力等级写入档案，提醒策略（音量 / 语速）按此在「提醒记录」页调整。</div>
+        <div id="elderList" style="margin-top:8px"></div>
+        <button class="btn btn-ghost btn-block" id="btnAddElderInline" style="margin-top:12px">+ 新增老人</button>
+      </div>
+      <div>
+        <div class="fb-title"><span class="dot"></span>药箱设备</div>
+        <div class="fb-sub">当前家庭的药箱与绑定状态。</div>
+        <div id="medboxList" style="margin-top:8px"></div>
+      </div>
+    </div>
+
+    <div class="fam-sec-h"><b>照护成员</b><span id="famCount"></span></div>
+    <div class="fam-grid" id="famGrid"></div>
+
+    <div class="fam-sec-h"><b>数据管理</b><span class="hint">隐私与数据最小化</span></div>
+    <div class="card">
+      <div class="chead"><div><h3>我的数据</h3><div class="sub">导出本家庭全部数据存档，或清空历史服药记录与告警（保留老人 / 药品 / 计划配置）</div></div></div>
+      <div class="acts" style="gap:10px">
+        <button class="btn btn-ghost" id="btnExportData">导出全部数据（JSON）</button>
+        <button class="btn btn-ghost" id="btnDeleteData" style="color:var(--bad);border-color:var(--bad)">清空服药记录与告警</button>
+      </div>
+    </div>
+  </main>
+</section>
+
+<!-- ============ 弹层 ============ -->
+<div class="modal" id="medModal">
+  <div class="dialog">
+    <div class="dh"><b id="medModalTitle">添加药品</b><button class="dx" onclick="closeModal('medModal')">✕</button></div>
+    <input type="file" id="medPhotoInput" accept="image/*" capture="environment" style="display:none">
+    <div class="fld" style="margin-bottom:8px">
+      <button class="btn btn-ghost btn-block" id="btnMedPhoto" type="button" style="justify-content:center;margin-top:0">&#128247; 拍照识药（AI 自动填写）</button>
+      <div class="recog-note" id="medRecogNote" style="display:none"></div>
+    </div>
+    <div class="fld"><label>药品名称</label><input id="m_name" required placeholder="如：苯磺酸氨氯地平片"></div>
+    <div class="fld2">
+      <div class="fld"><label>剂量规格 / 单位</label><div style="display:flex;gap:8px"><input id="m_spec" placeholder="如：5mg × 28" style="flex:1;min-width:0"><select id="m_unit" style="width:84px"><option>片</option><option>粒</option><option>袋</option><option>支</option><option>瓶</option><option>滴</option><option>包</option><option>其他</option></select></div></div>
+      <div class="fld"><label>厂家</label><input id="m_manu" placeholder="如：辉瑞"></div>
+    </div>
+    <div class="fld"><label>主要成分（用于相互作用检测）</label><input id="m_ingredient" placeholder="如：氨氯地平"></div>
+    <div class="fld2">
+      <div class="fld"><label>剩余数量</label><input id="m_stock" type="number" value="60"></div>
+      <div class="fld"><label>预警库存</label><input id="m_alert" type="number" value="14"></div>
+    </div>
+    <div class="fld2">
+      <div class="fld"><label>有效期至</label><input id="m_expiry" type="date"></div>
+      <div class="fld"><label>功能分类</label>
+        <select id="m_category"><option value="">未分类</option><option>降压</option><option>降糖</option><option>调脂</option><option>心血管</option><option>营养补充</option><option>其他</option></select></div>
+    </div>
+    <div class="fld"><label>外观（帮老人辨认）</label><input id="m_appear" placeholder="白色椭圆形片，一面有刻痕"></div>
+    <div class="fld"><label>禁忌与提示</label><input id="m_contra" placeholder="避免与葡萄柚汁同服"></div>
+    <button class="btn btn-dark btn-block" id="btnAddMed" type="button" style="margin-top:6px">添加到在库清单</button>
+  </div>
+</div>
+
+<!-- 弹层：新增老人 -->
+<div class="modal" id="elderModal">
+  <div class="dialog">
+    <div class="dh"><b>新增老人</b><button class="dx" onclick="closeModal('elderModal')">✕</button></div>
+    <div class="fld2">
+      <div class="fld"><label>姓名 *</label><input id="e_name" placeholder="如：王秀英"></div>
+      <div class="fld"><label>性别</label><select id="e_gender"><option value="female">女</option><option value="male">男</option></select></div>
+    </div>
+    <div class="fld2">
+      <div class="fld"><label>出生日期</label><input id="e_birth" type="date"></div>
+      <div class="fld"><label>年龄</label><input id="e_age" type="number" placeholder="78"></div>
+    </div>
+    <div class="fld2">
+      <div class="fld"><label>听力</label>
+        <select id="e_hearing"><option value="normal">正常</option><option value="mild">轻度下降</option><option value="moderate">中度下降</option><option value="severe">重度下降</option></select></div>
+      <div class="fld"><label>视力</label>
+        <select id="e_vision"><option value="normal">正常</option><option value="mild">轻度下降</option><option value="moderate">中度下降</option><option value="severe">重度下降</option></select></div>
+    </div>
+    <div class="fld"><label>慢病（逗号分隔）</label><input id="e_chronic" placeholder="高血压,2型糖尿病"></div>
+    <div class="fld"><label>过敏史</label><input id="e_allergy" placeholder="青霉素过敏"></div>
+    <button class="btn btn-dark btn-block" id="btnAddElder" type="button" style="margin-top:6px">新增老人</button>
+  </div>
+</div>
+
+<!-- 弹层：邀请成员 -->
+<div class="modal" id="inviteModal">
+  <div class="dialog">
+    <div class="dh"><b>邀请成员</b><button class="dx" onclick="closeModal('inviteModal')">✕</button></div>
+    <div class="fld"><label>账号（登录名）</label><input id="u_username" placeholder="字母、数字、下划线"></div>
+    <div class="fld"><label>初始密码</label><input id="u_password" type="password" placeholder="至少 6 位"></div>
+    <div class="fld2">
+      <div class="fld"><label>姓名</label><input id="u_realname" placeholder="真实姓名"></div>
+      <div class="fld"><label>角色</label>
+        <select id="u_role"><option value="member">可配置</option><option value="viewer">只读</option></select></div>
+    </div>
+    <button class="btn btn-dark btn-block" id="btnInvite" type="button" style="margin-top:6px">邀请加入</button>
+  </div>
+</div>
+
+<!-- 弹层：管理成员 -->
+<div class="modal" id="mmModal">
+  <div class="dialog">
+    <div class="dh"><b>管理成员</b><button class="dx" onclick="closeModal('mmModal')">✕</button></div>
+    <div class="mm-who">
+      <span class="avatar lg" id="mmAvatar">成</span>
+      <div><b id="mmName"></b><small id="mmMeta"></small></div>
+    </div>
+    <div class="mm-label">角色</div>
+    <div class="mm-roles" id="mmRoles">
+      <button type="button" data-r="owner">主配置人<em>可改一切</em></button>
+      <button type="button" data-r="member">可配置<em>改计划与告警</em></button>
+      <button type="button" data-r="viewer">只读<em>仅查看记录</em></button>
+    </div>
+    <div class="mm-label">接收哪些告警</div>
+    <div class="mm-alerts" id="mmAlerts">
+      <button type="button" data-a="missed">漏服</button>
+      <button type="button" data-a="duplicate">重复取药</button>
+      <button type="button" data-a="night">夜间异常</button>
+      <button type="button" data-a="offline">设备离线</button>
+      <button type="button" data-a="stock">库存不足</button>
+      <button type="button" data-a="conflict">用药冲突</button>
+      <button type="button" data-a="sos">SOS 求助</button>
+      <button type="button" data-a="repeat">连续漏服</button>
+    </div>
+    <div class="mm-foot">
+      <a class="txtlink danger" id="mmRemove">移除成员</a>
+      <div class="mm-acts">
+        <button class="btn btn-ghost" onclick="closeModal('mmModal')">取消</button>
+        <button class="btn btn-dark" id="mmSave">保存</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- ============ 移动 AI 对话窗口（可拖拽悬浮球 + 对话面板） ============ -->
+<div class="ai-fab" id="aiFab" title="AI 助手 · 一句话自动操作">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="5" y="8" width="14" height="11" rx="3"></rect>
+    <path d="M12 8V4M8 4h8"></path>
+    <circle cx="9.5" cy="13" r="0.5" fill="currentColor"></circle>
+    <circle cx="14.5" cy="13" r="0.5" fill="currentColor"></circle>
+    <path d="M9.5 16h5"></path>
+  </svg>
+</div>
+<div class="ai-panel" id="aiPanel" style="display:none">
+  <div class="ai-panel-head" id="aiPanelHead">
+    <div class="ai-panel-title"><span class="ai-panel-dot"></span>AI 助手 · 一句话自动操作</div>
+    <button class="ai-panel-close" id="aiPanelClose" title="关闭">×</button>
+  </div>
+  <div class="ai-panel-log" id="aiPanelLog"></div>
+  <div class="ai-confirm" id="aiConfirm" style="display:none">
+    <span id="aiConfirmText">确认执行以下操作？</span>
+    <div class="ai-confirm-btns">
+      <button class="ai-confirm-yes" id="aiConfirmYes">确认执行</button>
+      <button class="ai-confirm-no" id="aiConfirmNo">取消</button>
+    </div>
+  </div>
+  <div class="ai-panel-input">
+    <input id="aiPanelInput" type="text" placeholder="如：给王秀英加个 8 点吃阿司匹林的计划" autocomplete="off">
+    <button id="aiPanelSend">发送</button>
+  </div>
+</div>
+
+<script src="/js/api.js?v=20261106b"></script>
+<script src="/js/child.js?v=20261112b"></script>
+</body>
+</html>
