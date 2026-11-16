@@ -172,16 +172,24 @@ ok "数据库 ${DB_NAME} 与专用账号 ${DB_USER} 就绪"
 
 # 建表与种子数据用 root（socket 免密）执行：01_schema.sql 含 CREATE DATABASE，
 # 需要全局 CREATE 权限，专用账号只给了单库权限，故意不给它这个能力。
+# 用标记文件判断「导入是否已完成」：种子数据里有不带 IGNORE 的 INSERT，重复执行会主键冲突，
+# 所以不能用「库里有表」当依据 —— 那会让中途失败的库永远补不齐。
+IMPORT_MARK="$APP_DIR/.db-imported"
 TABLES_BEFORE=$(mysql -N -e "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='${DB_NAME}'")
-if [ "${TABLES_BEFORE:-0}" -gt 0 ]; then
-  warn "库里已有 ${TABLES_BEFORE} 张表，跳过 SQL 导入（避免覆盖现有数据）"
-  warn "如需强制重建：mysql -e 'DROP DATABASE ${DB_NAME}' 后重新执行本脚本"
+if [ -f "$IMPORT_MARK" ]; then
+  ok "数据库此前已完整导入（现有 ${TABLES_BEFORE} 张表），跳过导入"
 else
+  if [ "${TABLES_BEFORE:-0}" -gt 0 ]; then
+    warn "检测到上次导入中断残留的 ${TABLES_BEFORE} 张表，清空后完整重建（此为演示库，无业务数据）"
+    mysql -e "DROP DATABASE \`${DB_NAME}\`; CREATE DATABASE \`${DB_NAME}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+  fi
   for f in 01_schema 02_seed 03_auth 04_demo_data 05_device_session 06_shared_medbox \
            07_ingredient 08_drug_conflict_alert 09_medicine_expiry_category \
            10_user_alert_prefs 11_expiry_alert 12_medicine_barcode; do
-    mysql --default-character-set=utf8mb4 < "sql/${f}.sql" || die "导入 sql/${f}.sql 失败"
+    # 显式指定库：05/07~12 这几个脚本内部没有 USE 语句（靠 DATABASE() 取当前库）
+    mysql --default-character-set=utf8mb4 -D "${DB_NAME}" < "sql/${f}.sql" || die "导入 sql/${f}.sql 失败"
   done
+  touch "$IMPORT_MARK"
   ok "12 个基础脚本导入完成"
 fi
 
