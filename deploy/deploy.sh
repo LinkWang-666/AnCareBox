@@ -283,8 +283,12 @@ elif [ -n "$DOMAIN" ]; then
   warn "只给了 DOMAIN 没给 EMAIL，跳过证书申请。稍后可手动执行：certbot --nginx -d ${DOMAIN}"
 fi
 
-# ---------------------------------------------------------------- 完成
-PUBIP=$(curl -fsS -m 5 https://api.ipify.org 2>/dev/null || hostname -I | awk '{print $1}')
+# ---------------- 完成
+# 优先问阿里云元数据服务（内网直达，返回绑定的公网 IP）；
+# 退路才用 ipify 与 hostname -I —— 后者在 ECS 上拿到的是内网地址，贴给别人打不开。
+PUBIP=$(curl -fsS -m 3 http://100.100.100.200/latest/meta-data/eipv4 2>/dev/null \
+     || curl -fsS -m 6 https://api.ipify.org 2>/dev/null \
+     || hostname -I | awk '{print $1}')
 printf '\n\033[1;32m==================== 部署完成 ====================\033[0m\n\n'
 printf '  首页（登录）   http://%s/login.html\n' "$PUBIP"
 printf '  子女端         http://%s/index.html\n' "$PUBIP"
