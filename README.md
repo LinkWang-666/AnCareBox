@@ -564,8 +564,12 @@ AI 能力不是「接一个大模型就完事」，而是**规则打底、模型
 ### 2.12 部署形态
 
 单进程 Node.js 服务，监听 3000 端口，对外提供静态页面与 REST 接口，
-数据持久化在本地 MySQL。无容器、无反向代理依赖，`npm start` 即可运行。
+数据持久化在本地 MySQL。无容器依赖，`npm start` 即可运行。
 手机访问通过局域网 IP（`npm run lan-ip` 可打印地址）。
+
+**公网部署**：`deploy/deploy.sh` 提供 Ubuntu 一键部署（安装 MySQL 8 / Node 20、
+建库导数据、PM2 守护、nginx 反代、HTTPS 证书），重复执行幂等。
+完整步骤与故障排查见 [docs/DEPLOY.md](docs/DEPLOY.md)。
 
 ### 2.13 已知限制与安全边界
 
