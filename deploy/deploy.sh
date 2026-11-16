@@ -221,6 +221,25 @@ else
 fi
 pm2 save >/dev/null
 pm2 startup systemd -u root --hp /root >/dev/null 2>&1 || true
+
+# pm2 startup 只负责写 systemd 单元，不会启动它。
+# 此时进程仍挂在「手动敲 pm2 start 拉起的那条守护进程」上，
+# pm2-root.service 是 inactive —— 机器重启后 systemd 拉起的是空列表，站点不会恢复。
+# 这里检测到这种情况就切过去，让 systemd 真正接管。
+if systemctl list-unit-files 2>/dev/null | grep -q '^pm2-root\.service'; then
+  systemctl enable pm2-root >/dev/null 2>&1 || true
+  if ! systemctl is-active --quiet pm2-root; then
+    pm2 kill >/dev/null 2>&1 || true
+    sleep 1
+    systemctl daemon-reload
+    systemctl start pm2-root >/dev/null 2>&1 || true
+    sleep 2
+    # 兜底：万一进程列表没被恢复，别让站点停着
+    pm2 describe ancarebox >/dev/null 2>&1 \
+      || pm2 start server/app.js --name ancarebox --time >/dev/null
+    ok "已切换到 systemd 托管（pm2-root），重启机器后自动恢复"
+  fi
+fi
 ok "PM2 已托管，开机自启已配置"
 
 sleep 3
