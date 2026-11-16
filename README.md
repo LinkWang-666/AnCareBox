@@ -823,6 +823,7 @@ node scripts/probe-firstscreen.js
 | 参赛赛项 | AI Web 应用竞赛 |
 | 作品名称 | 安心格 AnCareBox · 智能药箱家庭用药协同系统 |
 | 交付形态 | Web 应用（子女端 / 老人端 / 移动端）+ 设备通信协议 |
+| 源码仓库 | <https://github.com/LinkWang-666/AnCareBox> |
 
 ### 4.2 成员与分工
 
