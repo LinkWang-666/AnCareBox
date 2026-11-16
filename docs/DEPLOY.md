@@ -111,10 +111,10 @@ sudo DOMAIN=your-domain.com EMAIL=you@example.com bash deploy.sh
 | 4 | 克隆代码到 `/opt/ancarebox`，重复执行则 `fetch + reset` 更新 |
 | 5 | 生成 `.env`：随机 32 字节 JWT 密钥、随机数据库密码，权限 600 |
 | 6 | 建库建账号（专用账号 `ancare`，只授权单库）、导入 12 个 SQL、跑设备迁移与演示账号 |
-| 7 | PM2 托管 + 开机自启 + 健康检查 |
+| 7 | PM2 启动 + 写 systemd 单元 + 切换到 `pm2-root` 托管（重启机器自动恢复）+ 健康检查 |
 | 8 | nginx 反代 80 → 3000（`client_max_body_size 25m`、超时 120s），有域名则签证书并配自动续期 |
 
-**可重复执行**：已装的不重装、`.env` 里已有的密码不重置、库里已有表则跳过导入（避免覆盖数据）。
+**可重复执行**：已装的不重装、`.env` 里已有的密码不重置、库已完整导入过则跳过（凭 `/opt/ancarebox/.db-imported` 标记判断）。若上一次导入中途失败留下了半套表，脚本会清空重建——因为种子数据里有不带 `IGNORE` 的 INSERT，补着导会主键冲突。
 
 ---
 
@@ -169,7 +169,9 @@ mysqldump -u root smart_medbox | gzip > /root/backup-$(date +%F).sql.gz
 | `curl` 本机能通、外网不通 | 应用绑了 `127.0.0.1` 或安全组未放行 | 本项目监听 `0.0.0.0`，问题多在安全组 |
 | 上传录音报 413 | nginx 请求体上限 | 脚本已设 `client_max_body_size 25m`，自定义配置时别漏 |
 | 证书申请失败 | 域名未备案 / DNS 未生效 / 80 被占 | `dig your-domain.com` 确认解析，备案查询用工信部系统 |
-| `git clone` 卡住或失败 | 国内访问 GitHub 不稳定 | 改用 Gitee 镜像仓库，或本地打包上传后解压 |
+| `git clone` 卡住或报 `GnuTLS recv error` | 国内访问 GitHub 被中断 | 让 git 走加速镜像：`git config --global url."https://ghproxy.net/https://github.com/".insteadOf "https://github.com/"`，然后重跑脚本（脚本里的仓库地址不用改） |
+| 重启机器后站点打不开 | `pm2 startup` 只写单元不启动，进程挂在手动起的守护进程下 | `systemctl status pm2-root` 若是 inactive：`pm2 save && pm2 kill && systemctl start pm2-root`（当前脚本已自动处理） |
+| 导入 SQL 报 `1046 No database selected` 或 `1060 Duplicate column` | 早期版本脚本导入时未指定库、部分迁移脚本用裸 ALTER | 拉最新代码重跑；脚本已改为 `mysql -D <库名>` 导入 + 幂等 ALTER |
 | `npm ci` 卡住 | registry 慢 | 脚本已优先用 `registry.npmmirror.com`，仍慢可手动 `npm config set registry` |
 | 登录后立刻掉线 | 反向代理没传 `X-Forwarded-Proto` | 脚本配置已包含；自定义 nginx 时需保留 |
 | 限流误伤所有访客 | 没开 `TRUST_PROXY` | `.env` 中设 `TRUST_PROXY=1`（脚本已自动写入） |
