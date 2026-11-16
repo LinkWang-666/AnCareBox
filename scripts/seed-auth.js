@@ -76,10 +76,18 @@ async function run() {
   //   上一轮跑测试脚本留下的 device_session 如果还挂着，
   //   子女端会看到一堆来历不明的设备记录，说不清是哪来的。
   //   和「子女端点生成绑定码」不同 —— 那只是给新设备开门，不该把老人正在用的踢掉。
-  const boxes = await query('SELECT id, device_code FROM medbox ORDER BY id');
+  const boxes = await query(
+    'SELECT id, device_code, bind_code, bind_code_expires_at FROM medbox ORDER BY id'
+  );
   const codes = [];
   for (const b of boxes) {
-    const code = randomCode();
+    // 已有未过期的绑定码就沿用，不重新随机。
+    // 原因：README 的演示表格、演示视频里输入的都是某一组码；
+    // 每次执行都换码会让「文档上写的」和「库里实际的」对不上，
+    // 评委照着文档输会提示绑定码错误，现场没法解释。
+    const stillValid =
+      b.bind_code && b.bind_code_expires_at && new Date(b.bind_code_expires_at) > new Date();
+    const code = stillValid ? b.bind_code : randomCode();
     await exec(
       `UPDATE medbox SET bind_code = ?, bind_code_expires_at = DATE_ADD(NOW(), INTERVAL 7 DAY),
               status = 'online'
