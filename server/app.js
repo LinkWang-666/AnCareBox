@@ -26,6 +26,15 @@ const { isDefaultSecret } = require('./services/auth');
 const app = express();
 const PORT = Number(process.env.PORT || 3000);
 
+/**
+ * 反向代理支持：部署在 nginx / 云负载均衡后面时必须开启。
+ * 不开的话 req.ip 永远是 127.0.0.1，全局限流会把所有访客算成同一个来源，
+ * 审计日志里的登录 IP 也全部失真。TRUST_PROXY=1 表示信任前面一层代理。
+ */
+if (process.env.TRUST_PROXY) {
+  app.set('trust proxy', Number(process.env.TRUST_PROXY) || 1);
+}
+
 // 安全响应头（X-Frame-Options / X-Content-Type-Options 等）
 // 这里关掉 CSP：演示项目的前端有内联样式和脚本，开启会被浏览器拦下。
 // 生产环境应当开启 CSP，并把内联内容改成外链文件。
