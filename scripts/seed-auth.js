@@ -107,6 +107,8 @@ async function run() {
   const lines = [];
   lines.push('**子女端登录**（<http://localhost:3000/login.html>）');
   lines.push('');
+  lines.push('线上实例：<http://47.117.6.63/login.html>（手机端 <http://47.117.6.63/m/login.html>）');
+  lines.push('');
   lines.push('| 账号 | 密码 | 家庭 | 姓名 | 角色 | 说明 |');
   lines.push('|---|---|---|---|---|---|');
   // 列全部账号（含 02_seed.sql 自带的两个），保证文档和实际一致
