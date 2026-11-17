@@ -79,6 +79,61 @@ app.use(rateLimit({
   legacyHeaders: false,
 }));
 
+/* ---------------------------------------------------------------- 手机访客自动进移动端
+ *
+ * 为什么要做：
+ *   桌面页面在手机上就是「缩小版电脑界面」，按钮只有几毫米宽，老人基本点不准。
+ *   public/m/ 下本来就有一套按拇指尺寸排版的移动端页面，但以前只能靠人自己敲 /m/。
+ *   答辩时评委拿手机输 IP，看到的会是桌面版，第一印象直接打折。
+ *
+ * 只对「入口页」做跳转：/api、/uploads、/js、/css 这些路径不在映射表里，
+ * 不参与判断，避免把接口请求也一起转走。
+ */
+const MOBILE_ENTRY = {
+  '/': '/m/',
+  '/index.html': '/m/index.html',
+  '/login.html': '/m/login.html',
+  '/landing.html': '/m/landing.html',
+  '/elder.html': '/m/elder.html',
+};
+
+/**
+ * 是不是手机。宁可漏判也不要误判——
+ * 把平板误当成手机跳过去，宽屏上反而更难用。
+ */
+function isMobileUA(ua) {
+  if (!ua) return false;
+  if (/iPad/i.test(ua)) return false;                             // iPad 屏幕够宽，桌面版更合适
+  if (/Android/i.test(ua) && !/Mobile/i.test(ua)) return false;   // Android 平板同理
+  return /Mobile|Android|iPhone|iPod|Windows Phone|BlackBerry|Opera Mini|IEMobile/i.test(ua);
+}
+
+app.use((req, res, next) => {
+  const target = MOBILE_ENTRY[req.path];
+  if (!target) return next();
+  if (req.method !== 'GET' && req.method !== 'HEAD') return next();
+
+  // 同一个地址对不同 UA 返回不同结果，必须声明 Vary，
+  // 否则中间的缓存层（CDN、企业代理）可能把桌面版缓存下来喂给手机
+  res.setHeader('Vary', 'User-Agent');
+
+  // 逃生通道：地址后加 ?desktop=1 可强制看桌面版，记 30 天。
+  // 移动端页面万一排版出问题，用户还有路可退，不至于被锁死在 /m/。
+  if (req.query.desktop === '1') {
+    res.cookie('ax_desktop', '1', { maxAge: 30 * 24 * 3600 * 1000, sameSite: 'lax' });
+    return next();
+  }
+  if (req.cookies && req.cookies.ax_desktop === '1') return next();
+
+  if (!isMobileUA(req.get('user-agent'))) return next();
+
+  // 保留原有查询参数（例如排查用的 ?api=），但不要把 desktop 带过去
+  const qs = new URLSearchParams(req.query);
+  qs.delete('desktop');
+  const suffix = qs.toString() ? '?' + qs.toString() : '';
+  res.redirect(302, target + suffix);
+});
+
 // 根路径：默认进入「介绍页」（长页落地），作为整个产品的门面
 app.get('/', (req, res) => res.redirect('/landing.html'));
 
