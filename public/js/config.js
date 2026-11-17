@@ -16,13 +16,18 @@
  *   2) localStorage 里手动保存过的地址  ← 手机上点「服务器地址」面板填一次，长期记住
  *   3) 本文件里的 MANUAL_BASE          后端不在本机、是 https 域名时改这里
  *   4) 自动推断：
- *        · 页面就在 3000 端口  → 空串，走相对路径，与改造前完全一致（零回归）
- *        · 页面在别的端口/主机 → http://当前主机:3000
- *        · file:// 打开        → 推断不出，需手动填写
+ *        · http / https 打开 → 空串，一律走相对路径（同源）
+ *        · file:// 打开      → 推断不出，需手动填写
+ *
+ *   第 4 条为什么不再按端口区分：页面既然是用 http(s) 从这台服务器拿到的，
+ *   接口就几乎必然同源。本地直跑、手机连电脑、云上 nginx 反代三种情形全是同源。
+ *   早先的实现会拼「当前主机:3000」，在 nginx 部署下必然连不上
+ *   （Node 只监听 127.0.0.1，3000 也不对外开放）。
  *
  * 连不上会怎样：
- *   自动弹一个「服务器地址」小面板（只在真的连不上时出现，桌面同源场景永远不弹），
- *   在手机浏览器里直接输入 http://电脑IP:3000 保存即可，不用改代码、不用重新打包。
+ *   自动弹一个「服务器地址」小面板，只在真的连不上时出现——同源正常时不弹，
+ *   手动指定过地址则先探一次 /api/health。面板文案按场景分流：
+ *   局域网调试讲「查电脑 IP」，线上部署讲「填当前页面地址、不要带 :3000」。
  */
 (function () {
   'use strict';
@@ -43,16 +48,50 @@
     return location.port || (location.protocol === 'https:' ? '443' : '80');
   }
 
-  /** 自动推断接口根地址；返回 '' 表示走同源相对路径 */
+  /**
+   * 自动推断接口根地址；返回 '' 表示走同源相对路径。
+   *
+   * 为什么一律走同源：
+   *   页面只要是用 http/https 打开拿到的，它和接口就几乎必然同源，三种情形都成立——
+   *     · 本地电脑直接跑 Node        → 页面在 :3000，接口也在 :3000
+   *     · 手机连电脑，输 http://IP:3000 → 同上
+   *     · 云服务器 nginx 反代         → 页面在 :80/:443，nginx 把 /api 转给 :3000
+   *   原来的实现在第三种情形下会拼出「主机:3000」，可线上 Node 只监听 127.0.0.1、
+   *   安全组也不放行 3000，请求根本出不了机房门，页面就整个连不上。
+   *
+   *   反过来，如果只按「页面端口是不是 3000」来判断，就会把同源这种最常见的情况
+   *   误判成跨源，所以这里不再猜端口，直接交给浏览器按相对路径解析。
+   */
   function autoBase() {
-    // file:// 没有 hostname，无法推断，交给手动配置
+    // file:// 没有 hostname，没有「同源」可言，只能手动填（见 boot）
     if (location.protocol === 'file:' || !location.hostname) return '';
+    return '';
+  }
 
-    // 页面本身就跑在后端端口上 —— 同源，用相对路径，与改造前完全一致
+  /**
+   * 同源不通时的备选地址，仅供面板预填，不参与正常路径。
+   * 对应一种真实存在的老用法：页面由别的静态服务（比如 :8080）托管，后端另跑在 :3000。
+   * 云端部署用不到它——那种情况下 3000 对外就是不通的，填了也没用。
+   */
+  function fallbackBase() {
+    if (location.protocol === 'file:' || !location.hostname) return '';
     if (String(currentPort()) === String(BACKEND_PORT)) return '';
-
     var scheme = location.protocol === 'https:' ? 'https://' : 'http://';
     return scheme + location.hostname + ':' + BACKEND_PORT;
+  }
+
+  /**
+   * 是不是「本机 / 局域网调试」场景。
+   * 只用来决定面板里那段提示怎么措辞：让手机连电脑的人看到「查电脑 IP」，
+   * 让访问线上地址的人看到「查服务器状态」，各说各的，不互相误导。
+   */
+  function isLanDebug() {
+    var h = String(location.hostname || '');
+    if (h === 'localhost' || h === '127.0.0.1' || h === '0.0.0.0' || h === '[::1]') return true;
+    if (/^192\.168\./.test(h)) return true;
+    if (/^10\./.test(h)) return true;
+    if (/^172\.(1[6-9]|2\d|3[01])\./.test(h)) return true;
+    return false;
   }
 
   /** 规范化用户输入的地址：补协议、去末尾斜杠、去掉误加的 /api */
@@ -135,7 +174,9 @@
         if (done) return;
         done = true;
         try { ctrl && ctrl.abort(); } catch (e) { /* ignore */ }
-        resolve({ ok: false, reason: '超时（4 秒没响应，多半是电脑防火墙拦了 ' + BACKEND_PORT + ' 端口）' });
+        // 措辞不写死「电脑防火墙」：线上部署超时通常是安全组没放行端口，
+        // 局域网才多半是本机防火墙，两者不能混为一谈。
+        resolve({ ok: false, reason: '超时（4 秒没有响应，地址不对、端口没开放或服务没启动）' });
       }, timeoutMs || 4000);
 
       fetch(url, { method: 'GET', cache: 'no-store', signal: ctrl ? ctrl.signal : undefined })
@@ -179,12 +220,28 @@
       + '#axApiPanel .axcancel{background:#EFEADC;color:#6F7C74}'
       + '#axApiPanel .axmsg{font-size:12px;margin:10px 0 0;min-height:16px;color:#8A968E}'
       + '#axApiPanel .axmsg.bad{color:#B4603A}'
-      + '#axApiPanel .axmsg.good{color:#4F7D66}';
+      + '#axApiPanel .axmsg.good{color:#4F7D66}'
+      + '#axApiPanel .axlink{display:block;width:100%;text-align:center;font-size:12px;color:#4F7D66;'
+      + 'margin:14px 0 0;background:none;border:0;padding:0;text-decoration:underline;'
+      + 'cursor:pointer;flex:none;font-family:inherit}';
 
     var st = document.createElement('style');
     st.id = 'axApiPanelStyle';
     st.textContent = css;
     document.head.appendChild(st);
+
+    // 提示文案按场景分流：让人看到的是自己这一种情况该怎么查，
+    // 而不是在云服务器上被建议「检查电脑防火墙」。
+    var lan = isLanDebug();
+    var label = lan ? '服务器地址（电脑的局域网 IP + 端口）' : '接口地址（一般与应用地址相同）';
+    var placeholder = lan ? 'http://192.168.1.10:3000' : (location.origin || 'http://服务器IP');
+    var hint = lan
+      ? '怎么查：在电脑上打开 <code>双击启动Web应用.bat</code>，窗口里会直接打印'
+        + '<code>手机访问：http://电脑IP:3000</code>，把这段地址填到上面即可。'
+        + '手机要和电脑连同一个 WiFi。'
+      : '若应用是用 nginx 部署的，直接填当前页面地址即可（例如 <code>'
+        + (location.origin || 'http://服务器IP') + '</code>），不要带 <code>:3000</code>。'
+        + '接口由 nginx 转发给后端，3000 端口本来就不对外开放。';
 
     var mask = document.createElement('div');
     mask.id = 'axApiMask';
@@ -192,25 +249,22 @@
       + '<div id="axApiPanel">'
       + '  <h3>连不上服务器</h3>'
       + '  <p class="axr">' + (reason || '没有响应') + '</p>'
-      + '  <p class="axl">服务器地址（电脑的局域网 IP + 端口）</p>'
+      + '  <p class="axl">' + label + '</p>'
       + '  <input id="axApiInput" type="text" inputmode="url" autocomplete="off" spellcheck="false"'
-      + '         placeholder="http://192.168.1.10:3000">'
-      + '  <p class="axhint">'
-      + '    怎么查：在电脑上打开 <code>双击启动Web应用.bat</code>，窗口里会直接打印'
-      + '    <code>手机访问：http://电脑IP:3000</code>，把这段地址填到上面即可。'
-      + '    手机要和电脑连同一个 WiFi。'
-      + '  </p>'
+      + '         placeholder="' + placeholder + '">'
+      + '  <p class="axhint">' + hint + '</p>'
       + '  <div class="axbtns">'
       + '    <button class="axcancel" id="axApiCancel">先不设</button>'
       + '    <button class="axok" id="axApiSave">测试并保存</button>'
       + '  </div>'
       + '  <p class="axmsg" id="axApiMsg"></p>'
+      + '  <button class="axlink" id="axApiReset">清空设置，改用当前页面地址</button>'
       + '</div>';
     document.body.appendChild(mask);
 
     var input = document.getElementById('axApiInput');
     var msg = document.getElementById('axApiMsg');
-    input.value = base || '';
+    input.value = base || fallbackBase() || location.origin || '';
 
     function say(text, cls) {
       msg.textContent = text;
@@ -219,6 +273,19 @@
 
     document.getElementById('axApiCancel').onclick = function () {
       mask.parentNode.removeChild(mask);
+    };
+
+    // 兜底出口：以前存过错误地址（比如线上环境填了 :3000）时，
+    // 让人一键退回同源，不用猜该填什么。
+    document.getElementById('axApiReset').onclick = function () {
+      try { localStorage.removeItem(LS_KEY); } catch (e) { /* 隐私模式，忽略 */ }
+      try {
+        var u = new URL(location.href);
+        u.searchParams.delete('api');
+        location.replace(u.toString());
+      } catch (e) {
+        location.reload();
+      }
     };
 
     document.getElementById('axApiSave').onclick = function () {
@@ -259,14 +326,18 @@
   };
 
   function boot() {
-    // 同源场景：页面就是后端发的，后端必然在线，不做探测（零回归）
-    if (!base && location.protocol !== 'file:') return;
-
+    // 本地文件打开：拿不到任何服务器信息，只能让人手填一次
     if (location.protocol === 'file:') {
       showPanel('当前是本地文件打开（file://），拿不到服务器地址，需要手动填一次。');
       return;
     }
 
+    // 同源（base 为空）：页面就是这个后端发的，后端必然在线，不做多余请求。
+    // 万一静态资源能拿到、接口却挂了，js/api.js 第一次真实请求失败时会调 AX_SHOW_PANEL，
+    // 那时候再弹面板，比开机就探一次更准，也不给每个页面平白加一个请求。
+    if (!base) return;
+
+    // 手动指定过地址（?api= / 本机保存 / MANUAL_BASE）：值得确认它现在还通
     probe(base + HEALTH_PATH, 4000).then(function (r) {
       if (!r.ok) showPanel('无法访问 ' + base + '　·　' + r.reason);
     });
